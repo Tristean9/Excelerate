@@ -1,6 +1,5 @@
 <template>
-  <excel-field-checker></excel-field-checker>
-  <excel-uploader></excel-uploader>
+  <router-view></router-view>
 
 </template>
 
@@ -8,6 +7,7 @@
 import ExcelUploader from "@/components/ExcelUploader.vue";
 import ExcelFieldChecker from "@/components/ExcelFieldChecker.vue";
 import Demo from "@/components/demo.vue";
+import FieldMaker from "@/components/FieldMaker.vue";
 
 </script>
 
