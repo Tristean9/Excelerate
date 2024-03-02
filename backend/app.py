@@ -8,6 +8,8 @@ import json
 app = Flask(__name__)
 CORS(app)
 
+file_rule_maker = FileRuleMaker()
+
 '''
 @app.route('/extract_fields_from_excel', methods=['POST'])
 def extract_fields_from_excel():
@@ -24,21 +26,38 @@ def extract_fields_from_excel():
 '''
 
 
+@app.route('/save_rawFile', methods=['POST'])
+def save_raw_file():
+    file = request.files.get("file")
+    file_name = request.files.get("file").filename
+
+    if file_name.endswith(".xls"):
+        # 转换处理
+        pass
+
+    if file:
+        # 给file_rule_maker 的属性赋值
+        pass
+
+        #
+        # return: "Upload file successfully", 500
+
+
 @app.route('/generate_user_rule_dict', methods=['POST'])
 def generate_user_rule_dict():
     file = request.files.get("file")
     file_name = request.files.get("file").filename
     fields_index_col_list = json.loads(request.form.get("fields"))
     fields_index_col_dict = {field['position']: field['fieldName'] for field in fields_index_col_list}
-    #print(file, file_name,fields_index_col_dict)
+    # print(file, file_name,fields_index_col_dict)
 
-    #print(type(file))
+    # print(type(file))
     if file.filename == "":
         return "No selected file", 400
     if file:
-        Field_rules = FileRuleMaker().generate_user_rule_dict(file, file_name, fields_index_col_dict)
-        #return send_file(Field_rules, as_attachment=True, download_name="modified.xlsx",
-                         #mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        field_rules = FileRuleMaker().generate_user_rule_dict(file, file_name, fields_index_col_dict)
+        # return send_file(field_rules, as_attachment=True, download_name="modified.xlsx",
+        # mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     return "Error processing file", 500
 
 

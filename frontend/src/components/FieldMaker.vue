@@ -1,9 +1,13 @@
 <script setup>
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+const data = route.params.data;
 
 </script>
 
 <template>
-  $END$
+  <h1>{{ data }}</h1>
 </template>
 
 <style scoped>
