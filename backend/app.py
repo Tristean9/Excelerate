@@ -1,64 +1,80 @@
+import io
+
 from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from services.file_rule_maker import FileRuleMaker
 from io import BytesIO
-from werkzeug.utils import secure_filename
+from utils import excel_processor
 import json
 
 app = Flask(__name__)
 CORS(app)
 
-file_rule_maker = FileRuleMaker()
-
-'''
-@app.route('/extract_fields_from_excel', methods=['POST'])
-def extract_fields_from_excel():
-    if 'file' not in request.files:
-        return "No file part", 400
-    file = request.files["file"]
-    if file.filename == "":
-        return "No selected file", 400
-    if file:
-        field_names, modified_excel_stream = FileRuleMaker().extract_fields_from_excel(file)
-        return send_file(modified_excel_stream, as_attachment=True, download_name="modified.xlsx",
-                         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    return "Error processing file", 500
-'''
+fuker = FileRuleMaker()
 
 
 @app.route('/save_rawFile', methods=['POST'])
 def save_raw_file():
     file = request.files.get("file")
     file_name = request.files.get("file").filename
-
-    if file_name.endswith(".xls"):
-        # 转换处理
-        pass
+    file_stream = io.BytesIO(file.read())
 
     if file:
-        # 给file_rule_maker 的属性赋值
-        pass
+        # 转换处理
+        if file_name.endswith(".xls"):
+            file_stream = excel_processor.Excel_IO().convert_excel_format(file_stream, "xls", "xlsx", True)
 
-        #
-        # return: "Upload file successfully", 500
+        # 给file_rule_maker 的属性赋值
+        fuker.get_file_stream(file_stream, file_name)
+
+        # 发送处理后的文件给前端
+        byte_stream = io.BytesIO()
+        byte_stream.write(file_stream.getvalue())
+        byte_stream.seek(0)  # 跳转到流的开头
+        return send_file(byte_stream,
+                         mimetype='application/vnd.ms-excel',
+                         as_attachment=True,
+                         download_name=file_name
+                         )
 
 
 @app.route('/generate_user_rule_dict', methods=['POST'])
 def generate_user_rule_dict():
-    file = request.files.get("file")
-    file_name = request.files.get("file").filename
+
     fields_index_col_list = json.loads(request.form.get("fields"))
     fields_index_col_dict = {field['position']: field['fieldName'] for field in fields_index_col_list}
     # print(file, file_name,fields_index_col_dict)
 
-    # print(type(file))
-    if file.filename == "":
-        return "No selected file", 400
-    if file:
-        field_rules = FileRuleMaker().generate_user_rule_dict(file, file_name, fields_index_col_dict)
-        # return send_file(field_rules, as_attachment=True, download_name="modified.xlsx",
-        # mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    if fields_index_col_dict:
+        print("fields_index_col_dict: ", fields_index_col_dict)
+        field_rules = fuker.generate_user_rule_dict(fields_index_col_dict)
+        print('field rules: ', field_rules)
+        return jsonify(field_rules)
     return "Error processing file", 500
+
+
+@app.route('/create_final_rules_and_examples', methods=['POST'])
+def create_final_rules_and_examples():
+    selected_field_rules = json.loads(request.form.get('finalRules'))
+    print("selected_field_rules: ", selected_field_rules)
+    final_rules_and_examples, _ = fuker.create_final_rules_and_examples(selected_field_rules)
+
+    return jsonify(final_rules_and_examples), 200
+
+
+@app.route('/create_final_rules_and_examples_file', methods=['POST'])
+def create_final_rules_and_examples_file():
+    selected_field_rules = json.loads(request.form.get('finalRules'))
+    _, simulate_rule_excel_stream = fuker.create_final_rules_and_examples(selected_field_rules)
+    # 发送处理后的文件给前端
+    byte_stream = io.BytesIO()
+    byte_stream.write(simulate_rule_excel_stream.getvalue())
+    byte_stream.seek(0)  # 跳转到流的开头
+
+    return send_file(byte_stream,
+                     mimetype='application/vnd.ms-excel',
+                     as_attachment=True,
+                     )
 
 
 if __name__ == '__main__':

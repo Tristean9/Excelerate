@@ -1,13 +1,13 @@
 <template>
-  <router-view></router-view>
+  <router-view v-slot="{ Component, route }">
+    <keep-alive include="ExcelFieldSelector">
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
 
 </template>
 
 <script setup>
-import ExcelUploader from "@/components/ExcelUploader.vue";
-import ExcelFieldChecker from "@/components/ExcelFieldChecker.vue";
-import Demo from "@/components/demo.vue";
-import FieldMaker from "@/components/FieldMaker.vue";
 
 </script>
 
