@@ -6,7 +6,8 @@ const store = createStore({
     return {
       BASE_URL: '/', // 替换为你的实际 URL
       isAdmin: false, // 或者你的逻辑来决定管理员状态
-      processedExcelBlob: null
+      processedExcelBlob: null,
+      finalExcelBlob: {}
     };
   },
 
@@ -16,6 +17,9 @@ const store = createStore({
     },
     setProcessedExcelBlob(state, data){
       state.processedExcelBlob = data;
+    },
+    setFinalExcelBlob(state, data){
+      state.finalExcelBlob = data;
     }
   },
   actions: {
@@ -25,9 +29,11 @@ const store = createStore({
     },
     fetchExcelFileData( { commit }, payload){
       commit('setProcessedExcelBlob', payload);
+    },
+    fetchFinalExcelData( { commit }, payload) {
+      commit('setFinalExcelBlob', payload);
     }
   }
-
 });
 
 export default store;

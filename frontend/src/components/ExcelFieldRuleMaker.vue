@@ -1,6 +1,6 @@
 <script setup>
-import { useStore } from "vuex";
-import {computed, reactive, ref, watchEffect} from "vue";
+import {useStore} from "vuex";
+import {computed, reactive, ref} from "vue";
 import http from "@/api/http.js";
 import router from "@/router/index.js";
 
@@ -16,71 +16,100 @@ const goBack = () =>{
   router.back();
 }
 
-for ( const category in rulesData.value){
-    selectedDropdowns[category] = {
+// 初始化被选择的框
+for ( const [position, [category, rules]] of Object.entries(rulesData.value)){
+    selectedDropdowns[position] = {
+      category,
       listRules: '',
       predefineRules: '',
       customRules: ''
   }
-  finalRules.value[category] = { ...selectedDropdowns[category] };
+  finalRules.value[position] = [category, { ...selectedDropdowns[position] }];
+}
+
+
+const checkAndSaveRules = (position) => {
+  let ruleCount;
+  // console.log('selectedDropdowns[position]: ', selectedDropdowns[position])
+  //const [category, rules] = selectedDropdowns[position];
+  const category = selectedDropdowns[position].category;
+  const rules = selectedDropdowns[position];
+
+  // console.log('category: ',category)
+  // console.log('rules: ', rules)
+  ruleCount = ['listRules', 'predefineRules', 'customRules'].reduce((count, ruleType) => {
+    if (rules[ruleType] ) count++;
+    return count;
+  }, 0);
+
+  if (ruleCount > 1) {
+    alert(`在${category}中只能选择一种规则。`);
+    return;  // 如果规则超过一种，则停止保存并弹出警告
+  }
+
+  // 如果用户自定义规则被选中，并且包含'/'，则分割为数组
+  if (rules.customRules && rules.customRules.includes('/')){
+    rules.customRules = rules.customRules.split('/').map(rule => rule.trim());
+  }
+
+  // 使用选择的规则构建最终规则数组
+  let finalRule;
+  if (rules.listRules ) finalRule = rules.listRules;
+  if (rules.predefineRules) finalRule = rules.predefineRules;
+  if (rules.customRules?.length) finalRule = finalRule.concat(rules.customRules);
+  // console.log(finalRule);
+  // 保存到finalRules，位置为键
+  finalRules.value[position] = [category, finalRule];
 }
 
 // 格式化最终规则
 const formattedFinalRules = computed(() => {
   let formatted = {};
-  for (const category in finalRules.value){
+  for (const [position, [category, rules]] of Object.entries(finalRules.value)){
+    // 确保规则是一个数组
+    let rulesArray = Array.isArray(rules) ? rules : [rules];
     // 过滤掉空字符串
-    let rules = Object.values(finalRules.value[category]).filter(rule => rule && rule.length > 0);
+    rulesArray = rulesArray.filter(rule => rule && rule.length > 0);
     // 不将空数组加入到formatted中
-    if (rules.length >0){
+    if (rulesArray.length > 0){
       // 如果是数组，则展开它并加入到rules中
-      rules = rules.flatMap(rule => Array.isArray(rule) ? rule : [rule]);
-      formatted[category] = rules;
+      formatted[position] = [category, rulesArray];
     }
   }
   return formatted;
 });
 
-const checkAndSaveRules = (category) => {
-  let ruleCount;
-  const rules = selectedDropdowns[category];
-    ruleCount = ['listRules', 'predefineRules', 'customRules'].reduce((count, ruleType) => {
-      if (rules[ruleType] ) count++;
-      return count;
-    }, 0);
-
-    if (ruleCount > 1) {
-      alert(`在${category}中只能选择一种规则。`);
-      return;  // 如果规则超过一种，则停止保存并弹出警告
-    }
-
-    // 如果用户自定义规则被选中，并且包含'/'，则分割为数组
-    if (rules.customRules && rules.customRules.includes('/')){
-      rules.customRules = rules.customRules.split('/').map(rule => rule.trim());
-    }
-
-    // 如果规则没有超过一种，则将其保存到finalRules中
-    finalRules.value[category] = { ...rules };
-
-      // 清除用户没有选择的规则
-    ['listRules', 'predefineRules', 'customRules'].forEach(ruleType => {
-    if (!rules[ruleType]) {
-      finalRules.value[category][ruleType] = '';
-    }
-  });
-}
-
 // 发送最终制定好的规则给服务器
 const sendFinaFormattedRules = async () => {
   const formData = new FormData();
+  // console.log(formattedFinalRules.value);
   const rulesString = JSON.stringify(formattedFinalRules.value);
+
   formData.append('finalRules', rulesString);
 
-  const dataResponse = await http.post('/create_final_rules_and_examples', formData );
+  // const dataResponse = await http.post('/create_final_rules_and_examples', formData );
   const fileStreamResponse = await http.post('create_final_rules_and_examples_file', formData);
 
-  console.log('dataResponse: ', dataResponse.data);
-  console.log('fileStreamResponse: ', fileStreamResponse.data);
+  // 处理包含Base64编码数据的响应
+  const response = fileStreamResponse.data
+  //将Base64编码文件转换成Blob对象
+  const fileBlobData = {};
+  for (const [mode, base64String] of Object.entries(response)){
+    const byteCharacters = atob(base64String);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++){
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    fileBlobData[mode] = new Blob([byteArray], {type: 'application/vnd.ms-excel'});
+  }
+  // console.log('dataResponse: ', dataResponse.data);
+  // console.log('fileStreamResponse: ', fileBlobData);
+
+  await store.dispatch('fetchFinalExcelData', fileBlobData);
+  // console.log(computed(() => store.state.finalExcelBlob).value);
+
+  await router.push({name:'excelFieldRuleShower'});
 }
 
 </script>
@@ -89,14 +118,14 @@ const sendFinaFormattedRules = async () => {
   <h1>规则制定页面</h1>
   <div id="rule-maker-container">
     <div id="rule-maker">
-      <div v-for="(rules, category) in rulesData" :key="category">
-      <h2>{{ category }}</h2>
+      <div v-for="(entry, position) in rulesData" :key="position">
+      <h2>{{ position }} - {{ entry[0] }}</h2>
       <div class="dropdowns">
         <div>
           <label>对应下拉列表规则:</label>
-          <select v-model="selectedDropdowns[category]['listRules']">
-            <option v-if="!rules['对应列下拉列表规则'].length" disabled value="">无可用规则</option>
-            <option v-for="rule in rules['对应列下拉列表规则']" :key="rule" :value="rule">
+          <select v-model="selectedDropdowns[position]['listRules']">
+            <option v-if="!entry[1]['对应列下拉列表规则'].length" disabled value="">无可用规则</option>
+            <option v-for="rule in entry[1]['对应列下拉列表规则']" :key="rule" :value="rule">
               {{ rule }}
             </option>
             <option value="">不使用</option>
@@ -105,9 +134,9 @@ const sendFinaFormattedRules = async () => {
         </div>
         <div>
           <label>程序预定义规则:</label>
-          <select v-model="selectedDropdowns[category]['predefineRules']">
-            <option v-if="!rules['程序预定义规则'].length" disabled value="">无可用规则</option>
-            <option v-for="rule in rules['程序预定义规则']" :key="rule" :value="rule">
+          <select v-model="selectedDropdowns[position]['predefineRules']">
+            <option v-if="!entry[1]['程序预定义规则'].length" disabled value="">无可用规则</option>
+            <option v-for="rule in entry[1]['程序预定义规则']" :key="rule" :value="rule">
               {{ rule }}
             </option>
             <option value="">不使用</option>
@@ -116,10 +145,10 @@ const sendFinaFormattedRules = async () => {
         </div>
         <div>
             <label>用户自定义规则:</label>
-            <input type="text" placeholder="使用/分隔规则" v-model="selectedDropdowns[category]['customRules']" />
+            <input type="text" placeholder="使用/分隔规则" v-model="selectedDropdowns[position]['customRules']" />
           </div>
       </div>
-      <button @click="checkAndSaveRules(category)">保存全部规则</button>
+      <button @click="checkAndSaveRules(position)">保存全部规则</button>
     </div>
     </div>
     <div id="final-rules">

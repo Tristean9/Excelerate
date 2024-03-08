@@ -43,13 +43,18 @@ const uploadAndLoadExcelFile = async () => {
 
 <template>
   <div>
-    <h1>文件上传页面</h1>
+    <div id="title">文件上传页面</div>
     <input id="fileLoader" type="file" accept=".xlsx,.xls" @change="handledFileSelection"/>
     <button @click="uploadAndLoadExcelFile">Open</button>
   </div>
 </template>
 
 <style>
+
+#title {
+  display: flex;
+  justify-content: center;
+}
 
 input[type="file"] {
   border: 1px solid #ccc;
