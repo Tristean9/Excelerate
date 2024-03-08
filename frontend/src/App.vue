@@ -5,9 +5,14 @@
     </keep-alive>
   </router-view>
 
+  
+
 </template>
 
+
 <script setup>
+
+import inputselect from '@/components/inputselect.vue'
 
 </script>
 

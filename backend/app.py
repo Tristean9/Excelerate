@@ -1,5 +1,5 @@
 import io
-
+import base64
 from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from services.file_rule_maker import FileRuleMaker
@@ -40,7 +40,6 @@ def save_raw_file():
 
 @app.route('/generate_user_rule_dict', methods=['POST'])
 def generate_user_rule_dict():
-
     fields_index_col_list = json.loads(request.form.get("fields"))
     fields_index_col_dict = {field['position']: field['fieldName'] for field in fields_index_col_list}
     # print(file, file_name,fields_index_col_dict)
@@ -65,16 +64,21 @@ def create_final_rules_and_examples():
 @app.route('/create_final_rules_and_examples_file', methods=['POST'])
 def create_final_rules_and_examples_file():
     selected_field_rules = json.loads(request.form.get('finalRules'))
-    _, simulate_rule_excel_stream = fuker.create_final_rules_and_examples(selected_field_rules)
-    # 发送处理后的文件给前端
-    byte_stream = io.BytesIO()
-    byte_stream.write(simulate_rule_excel_stream.getvalue())
-    byte_stream.seek(0)  # 跳转到流的开头
+    print("selected_field_rules: ", selected_field_rules)
+    final_rules_and_examples, simulate_rule_excel_stream_dict = fuker.create_final_rules_and_examples(
+        selected_field_rules)
 
-    return send_file(byte_stream,
-                     mimetype='application/vnd.ms-excel',
-                     as_attachment=True,
-                     )
+    # 发送处理后的文件给前端
+    file_data = {}
+    for mode, simulate_rule_excel_stream in simulate_rule_excel_stream_dict.items():
+        byte_stream = io.BytesIO()
+        byte_stream.write(simulate_rule_excel_stream.getvalue())
+        byte_stream.seek(0)  # 跳转到流的开头
+
+        # 将数据流转换为Base64编码的字符串
+        file_data[mode] = base64.b64encode(byte_stream.getvalue()).decode('utf-8')
+
+    return jsonify(file_data), 200
 
 
 if __name__ == '__main__':

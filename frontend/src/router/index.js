@@ -4,6 +4,7 @@ import Demo from "@/components/demo.vue";
 import ExcelFieldRuleMaker from "@/components/ExcelFieldRuleMaker.vue";
 import ExcelFieldSelector from "@/components/ExcelFieldSelector.vue";
 import ExcelFileUploader from "@/components/ExcelFileUploader.vue";
+import ExcelFieldRuleShower from "@/components/ExcelFieldRuleShower.vue";
 
 const routes = [
     {   path: "/",
@@ -15,10 +16,15 @@ const routes = [
         component: ExcelFieldSelector
     },
     {
-        path: "/field-rule-maker/:data",
-        name: "fieldRuleMaker",
+        path: "/excel-field-rule-maker/",
+        name: "excelFieldRuleMaker",
         component: ExcelFieldRuleMaker
-    }
+    },
+    {
+        path: "/field-rule-shower/",
+        name: "excelFieldRuleShower",
+        component: ExcelFieldRuleShower
+    },
 ]
 
 const router = createRouter({
