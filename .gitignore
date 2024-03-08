@@ -1,16 +1,3 @@
-/backend/syz/
-/backend/.idea
-/backend/services/__pycache__/__init__.cpython-39.pyc
-/backend/services/__pycache__/file_rule_maker.cpython-39.pyc
-/backend/services/__pycache__/file_rule_maker.cpython-312.pyc
-/backend/__pycache__/app.cpython-39.pyc
-/backend/__pycache__/app.cpython-312.pyc
-/backend/utils/__pycache__/__init__.cpython-39.pyc
-/backend/utils/__pycache__/__init__.cpython-312.pyc
-/backend/utils/__pycache__/excel_processor.cpython-39.pyc
-/backend/utils/__pycache__/excel_processor.cpython-312.pyc
-/backend/utils/__pycache__/string_processor.cpython-39.pyc
-/backend/utils/__pycache__/string_processor.cpython-312.pyc
 /temp.md
-/backend/services/__pycache__/__init__.cpython-312.pyc
+
 
