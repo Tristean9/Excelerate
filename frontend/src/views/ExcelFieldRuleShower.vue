@@ -75,7 +75,7 @@ const switchMode = (newMode) => {
 }
 
 
-const saveCurrentExcelFile =  () => {
+const saveCurrentExcelFile = () => {
   const options = {
     // includeStyles: true,
 
@@ -92,16 +92,21 @@ const saveCurrentExcelFile =  () => {
 </script>
 
 <template>
+  <div class="title-container">
+    <div class="title-text">规则样例展示页面</div>
+  </div>
   <div id="excel-shower-container">
     <gc-spread-sheets :hostStyle="spreadStyles" @workbookInitialized="initSpread">
       <gc-worksheet></gc-worksheet>
     </gc-spread-sheets>
     <div id="tip-mode">
-      <div class="tip-text">请选择你需要展示的表格的模式</div>
+      <div class="tip-text-container">
+        <h2>请选择你需要展示的表格的模式</h2>
+      </div>
       <button v-for="mode in Object.keys(store.state.finalExcelBlob)" :key="mode" @click="switchMode(mode)"> {{
       modeText[mode]
     }}</button>
-    <button @click="saveCurrentExcelFile">save</button>
+      <button @click="saveCurrentExcelFile">save</button>
     </div>
 
   </div>
@@ -117,7 +122,10 @@ const saveCurrentExcelFile =  () => {
   display: flex;
   flex-direction: column;
   gap: 50px;
+}
 
-
+.tip-text-container {
+  justify-content: center;
+  align-items: center;
 }
 </style>

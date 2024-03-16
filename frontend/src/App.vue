@@ -5,17 +5,32 @@
     </keep-alive>
   </router-view>
 
-  
 
 </template>
 
 
 <script setup>
 
-import inputselect from '@/components/inputselect.vue'
 
 </script>
 
 <style>
+.title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
 
+}
+
+.title-text {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.uploader{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>

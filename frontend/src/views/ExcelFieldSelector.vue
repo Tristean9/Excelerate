@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, watch, nextTick, computed } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
 
 import router from "@/router/index.js";
@@ -26,20 +26,14 @@ const initSpread = (s) => {
 
   bindCellClickForActiveSheet(); // 绑定事件到初始工作表
 
-  // 监听工作表切换事件
-  spread.value.bind(GC.Spread.Sheets.Events.SheetChanged, (sender, args) => {
-    bindCellClickForActiveSheet(); // 重新绑定事件到新的工作表
-  });
-
 };
 
 const loadAndDisplayExcelContent = async (processedExcelBlob) => {
   const options = {
     includeStyles: true,
+    includeFormulas: true,
   }
   if (processedExcelBlob.value) {
-    spread.value.clearSheets();
-    spread.value.suspendPaint();
     spread.value.import(processedExcelBlob.value, () => {
       for (let i = 0; i < spread.value.getSheetCount(); i++) {
         let sheet = spread.value.getSheet(i);
@@ -56,22 +50,10 @@ const loadAndDisplayExcelContent = async (processedExcelBlob) => {
       if (sheet.getColumnCount() < minColumnCount) {
         sheet.setColumnCount(minColumnCount)
       }
-      spread.value.resumePaint();
+
 
       bindCellClickForActiveSheet(); // 绑定事件到初始工作表
-      spread.value.bind(GC.Spread.Sheets.Events.SheetChanged, (sender, args) => {
-        //console.log("changed")
-        const sheet = spread.value.getActiveSheet();
 
-        if (sheet.getRowCount() < minRowCount) {
-          sheet.setRowCount(minRowCount)
-        }
-
-        if (sheet.getColumnCount() < minColumnCount) {
-          sheet.setColumnCount(minColumnCount)
-        }
-        bindCellClickForActiveSheet(); // 重新绑定事件到新的工作表
-      })
     }, (error) => {
       console.error("Import failed: ", error)
     }, options);
@@ -85,22 +67,29 @@ const removeField = (index) => {
 const bindCellClickForActiveSheet = () => {
   const sheet = spread.value.getActiveSheet();
   // 先解绑可能已经存在的事件绑定
-  sheet.unbind(GC.Spread.Sheets.Events.CellClick);
-  // 绑定CellClick事件到当前工作表
-  sheet.bind(GC.Spread.Sheets.Events.CellClick, (e, info) => {
-    if (info.sheetArea === GC.Spread.Sheets.SheetArea.viewport) {
-      const position = GC.Spread.Sheets.CalcEngine.rangeToFormula(info.sheet.getRange(info.row, info.col, 1, 1), info.row, info.col, GC.Spread.Sheets.CalcEngine.RangeReferenceRelative.allRelative);
-      const fieldName = info.sheet.getValue(info.row, info.col);
+  sheet.unbind(GC.Spread.Sheets.Events.SelectionChanged);
 
-      const isPositionExist = selectedFields.value.some(item => item.position === position);
+  // 绑定SelectionChanged事件到当前工作表
+  sheet.bind(GC.Spread.Sheets.Events.SelectionChanged, (sender, args) => {
+    const selections = sheet.getSelections();
+    selections.forEach((range) => {
+      for (let r = range.row; r < range.row + range.rowCount; r++) {
+        for (let c = range.col; c < range.col + range.colCount; c++) {
+          const position = GC.Spread.Sheets.CalcEngine.rangeToFormula(sheet.getRange(r, c, 1, 1), r, c, GC.Spread.Sheets.CalcEngine.RangeReferenceRelative.allRelative);
+          const fieldName = sheet.getValue(r, c);
 
-      if (!isPositionExist) {
-        selectedFields.value.push({ position, fieldName });
-      } else {
-        alert(`位置 ${position} 已经被选中`)
+          const isPositionExist = selectedFields.value.some(item => item.position === position);
+
+          if (!isPositionExist) {
+            selectedFields.value.push({ position, fieldName });
+          } else {
+            // 如果不希望在选择时弹出警告，可以注释掉下面的alert
+            alert(`位置 ${position} 已经被选中`);
+          }
+        }
       }
-    }
-  });
+    });
+  })
 }
 
 const sendFiledNames = async () => {
@@ -117,7 +106,7 @@ const sendFiledNames = async () => {
     if (rulesData.value) {
       // 跳转到规则指定模块
       // console.log(rulesData.value)
-      await router.push({ name: 'excelFieldRuleMaker' });
+      await router.push({ name: 'ExcelFieldRuleMaker' });
     }
     // 处理响应，例如：显示成功消息或处理错误
   } catch (error) {
@@ -150,8 +139,10 @@ onBeforeRouteLeave((to, from, next) => {
 </script>
 
 <template>
+  <div class="title-container">
+    <div class="title-text">规则字段选择页面</div>
+  </div>
   <div>
-    <h1>规则字段选择页面</h1>
     <div class="excel-tip">
       <div id="excel-area">
         <div id="excel-tools">

@@ -4,34 +4,60 @@ import { createStore } from 'vuex';
 const store = createStore({
   state() {
     return {
-      BASE_URL: '/', // 替换为你的实际 URL
-      isAdmin: false, // 或者你的逻辑来决定管理员状态
       processedExcelBlob: null,
-      finalExcelBlob: {}
+      finalExcelBlob: {},
+      checkedExcelBlob: null,
+      rulesData: {},
+      errorPosition: {}
+
     };
   },
 
   mutations: {
-    setRulesData(state, data){
+    setRulesData(state, data) {
       state.rulesData = data;
     },
-    setProcessedExcelBlob(state, data){
+    setProcessedExcelBlob(state, data) {
       state.processedExcelBlob = data;
     },
-    setFinalExcelBlob(state, data){
+    setFinalExcelBlob(state, data) {
       state.finalExcelBlob = data;
+    },
+    setCheckedExcelBlob(state, data) {
+      state.checkedExcelBlob = data;
+    },
+    setPreSelectedDropDowns(state, data) {
+      state.preSelectedDropDowns = data;
+    },
+    DELETE_RULE(state, position) {
+      delete state.rulesData[position]
+    },
+    setErrorPosition(state, data) {
+      state.errorPosition = data
     }
   },
   actions: {
-    fetchRulesData( { commit }, payload){
+    fetchRulesData({ commit }, payload) {
       // 模拟从服务器获取数据
       commit('setRulesData', payload);
     },
-    fetchExcelFileData( { commit }, payload){
+    fetchProcessedExcelData({ commit }, payload) {
       commit('setProcessedExcelBlob', payload);
     },
-    fetchFinalExcelData( { commit }, payload) {
+    fetchFinalExcelData({ commit }, payload) {
       commit('setFinalExcelBlob', payload);
+    },
+    fetchCheckedExcelData({ commit }, payload) {
+      commit('setCheckedExcelBlob', payload);
+    },
+    savePreSelectedDropDowns({ commit }, payload) {
+      commit('setPreSelectedDropDowns', payload);
+    },
+    deleteRule({ commit }, position) {
+      commit('DELETE_RULE', position)
+    },
+    fetchErrorPosition({ commit }, payload){
+      commit('setErrorPosition', payload)
     }
   }
 });

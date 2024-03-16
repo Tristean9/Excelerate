@@ -8,6 +8,33 @@
   font-weight: normal;
 }
 
+input[type="file"] {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+button {
+  padding: 10px 15px;
+  font-size: 16px;
+  color: white;
+  background-image: linear-gradient(to right, #667eea, #764ba2);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  margin-right: 10px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+ul {
+  padding-inline-start: 5px;
+}
+
 a,
 .green {
   text-decoration: none;
@@ -15,7 +42,9 @@ a,
   transition: 0.4s;
   padding: 3px;
 }
-
+p{
+  color: black;
+}
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);
