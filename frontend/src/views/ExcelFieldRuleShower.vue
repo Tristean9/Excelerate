@@ -9,7 +9,7 @@ import store from "@/store/index.js";
 import { saveAs } from 'file-saver';
 
 
-const currentMode = ref('1-1');
+const currentMode = ref('2-2');
 const spread = ref(null);
 const spreadStyles = { width: '1000px', height: '600px' };
 // 存储所有的excelBlob;

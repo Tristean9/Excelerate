@@ -14,7 +14,10 @@ class Excel_IO:
     def read_excel_file(self, excel_path, sheet_index=0):
         """openpyxl读取某路径的excel文件,有点害人,返回的是wb和ws的tuple,略微合理。"""
         try:
-            excel_wb = px.load_workbook(excel_path, data_only=True)
+            excel_wb = px.load_workbook(excel_path)
+            # 判断是否存在名为"Evaluation Version"的工作表
+            if "Evaluation Version" in excel_wb.sheetnames:
+                sheet_index+=1
             excel_ws = excel_wb.worksheets[sheet_index]
             return (excel_wb,excel_ws)
         except IOError as e:

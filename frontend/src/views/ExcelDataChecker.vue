@@ -1,10 +1,11 @@
 <script setup>
 
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, nextTick } from 'vue';
 
 import router from "@/router/index.js";
 import store from "@/store/index.js";
 import http from '@/api/http';
+import { saveAs } from 'file-saver';
 
 import '@grapecity/spread-sheets/styles/gc.spread.sheets.excel2016colorful.css';
 import { GcSpreadSheets, GcWorksheet } from '@grapecity/spread-sheets-vue';
@@ -14,23 +15,31 @@ import * as GC from '@grapecity/spread-sheets'
 const spread = ref(null);
 const spreadStyles = { width: "1000px", height: "600px" };
 
+const ruleFile = computed(() => store.state.ruleFile);
+// console.log("ruleFile：", ruleFile);
 const checkedExcelBlob = computed(() => store.state.checkedExcelBlob);
-console.log("checkedExcelBlob:", checkedExcelBlob);
+const currentExcelBlob = ref(checkedExcelBlob.value);
+// console.log("checkedExcelBlob:", checkedExcelBlob);
 const errorPosition = computed(() => store.state.errorPosition);
-console.log('errorPosition: ', errorPosition);
+const currentErrorPosition = ref(errorPosition.value);
+// console.log('errorPosition: ', errorPosition);
 const initSpread = (s) => {
     spread.value = s;
-    loadAndDisplayExcelContent(checkedExcelBlob)
+    loadAndDisplayExcelContent(currentExcelBlob)
 }
 
 const loadAndDisplayExcelContent = async (checkedExcelBlob) => {
+
     const options = {
         includeStyles: true,
     }
     if (checkedExcelBlob.value) {
         spread.value.import(checkedExcelBlob.value, () => {
 
+            spread.value.setActiveSheet(0);
+            // await nextTick(); // 确保Vue更新了DOM
             const sheet = spread.value.getActiveSheet();
+
             const minRowCount = 50;
             const minColumnCount = 50;
 
@@ -41,30 +50,51 @@ const loadAndDisplayExcelContent = async (checkedExcelBlob) => {
             if (sheet.getColumnCount() < minColumnCount) {
                 sheet.setColumnCount(minColumnCount)
             }
+            spread.value.resumePaint();
         }, (error) => {
             console.error("Import failed: ", error)
         }, options);
     }
 }
 
+
 const newCheckedExcelBlob = ref(null);
 const checkExcelData = async () => {
     const options = {
         includeStyles: true,
-
+        includeUnusedNames: false
     }
-    spread.value.export((blob) => {
+    spread.value.export(async (blob) => {
         newCheckedExcelBlob.value = blob;
+
+        const formData = new FormData();
+        formData.append('excelFile', newCheckedExcelBlob.value);
+
+        const response = await http.post('/check_data', formData);
+
+        // console.log('response', response.data.checked_excel
+        const base64String = response.data.checked_excel
+        const errorPosition = response.data.error_index_col
+        currentErrorPosition.value = errorPosition;
+        // 将Base64编码文件转换成Blob对象
+        const byteCharacters = atob(base64String);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const fileBlobData = new Blob([byteArray], { type: 'application/vnd.ms-excel' });
+        console.log("fileBlobData:", fileBlobData);
+
+
+        currentExcelBlob.value = fileBlobData;
+
+        loadAndDisplayExcelContent(currentExcelBlob);
+
     }, (error) => {
         console.error("error: ", error)
     }, options);
-    const formData = new FormData();
-    formData.append('checkedExcelBlob', newCheckedExcelBlob.value);
 
-    const response = await http.post('/check_data', formData, { responseType: "blob" });
-
-    const checkExcelData = response.data;
-    loadAndDisplayExcelContent(checkExcelData);
 
 }
 
@@ -72,14 +102,25 @@ const isModalVisible1 = ref(false)
 const isModalVisible2 = ref(false)
 
 const saveExcel = () => {
+    console.log("currentErrorPosition", currentErrorPosition.value);
 
-    isModalVisible1.value = true;
+    if (!currentErrorPosition.value == {}) {
+        isModalVisible1.value = true;
+    } else {
+        isModalVisible2.value = true
+        confirmSave();
+    }
 }
 
 const confirmSave = () => {
     // 实现保存逻辑
 
     isModalVisible1.value = false;
+    spread.value.export((blob) => {
+        saveAs(blob, 'ddd.xlsx')
+    }, (error) => {
+        console.error("error: ", error)
+    }, {})
     console.log('保存成功');
 }
 
@@ -98,8 +139,14 @@ const cancelSave = () => {
         <div id="tip-button">
             <h2>请点击检查按钮进行数据检验</h2>
             <button @click="checkExcelData">检查</button>
-            <h2>以下是可能存在问题的数据的位置</h2>
-            <h3>{{ errorPosition }}</h3>
+
+            <template v-if="currentErrorPosition.value && Object.keys(currentErrorPosition.value).length > 0">
+                <h2>以下是可能存在问题的数据的位置</h2>
+                <h3>{{ currentErrorPosition }}</h3>
+            </template>
+            <template v-else>
+                <h2>您的代码经建议已无问题</h2>
+            </template>
             <button @click="saveExcel">保存</button>
         </div>
 
@@ -113,7 +160,7 @@ const cancelSave = () => {
     </div>
     <div v-if="isModalVisible2" class="modal">
         <div class="modal-content">
-            <p>您的数据经检查已无问题，已为您保存</p>
+            <p>您的数据经检查已无问题，正在为您保存</p>
         </div>
     </div>
 
@@ -149,5 +196,4 @@ const cancelSave = () => {
     border-radius: 5px;
     text-align: center;
 }
-
 </style>

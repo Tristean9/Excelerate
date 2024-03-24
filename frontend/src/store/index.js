@@ -8,7 +8,8 @@ const store = createStore({
       finalExcelBlob: {},
       checkedExcelBlob: null,
       rulesData: {},
-      errorPosition: {}
+      errorPosition: {},
+      ruleFile: {}
 
     };
   },
@@ -34,6 +35,9 @@ const store = createStore({
     },
     setErrorPosition(state, data) {
       state.errorPosition = data
+    },
+    setRuleFile(state, data) {
+      state.ruleFile = data;
     }
   },
   actions: {
@@ -58,6 +62,9 @@ const store = createStore({
     },
     fetchErrorPosition({ commit }, payload){
       commit('setErrorPosition', payload)
+    },
+    saveRuleFile({ commit }, payload){
+      commit('setRuleFile', payload)
     }
   }
 });

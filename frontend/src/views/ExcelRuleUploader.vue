@@ -17,6 +17,7 @@ const handledExcelFileSelection = (event) => {
 const handledRuleFileSelection = (event) => {
     ruleFile.value = event.target.files[0];
     console.log("ruleFile:", ruleFile.value);
+    store.dispatch('saveRuleFile', ruleFile.value);
 };
 
 const uploadAndLoadExcelFile = async () => {
