@@ -15,6 +15,7 @@
 </script>
 
 <style>
+
 .title-container {
   display: flex;
   justify-content: center;
@@ -28,9 +29,18 @@
   font-weight: bold;
 }
 
+.uploader-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .uploader{
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
+
 </style>

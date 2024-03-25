@@ -5,6 +5,7 @@ from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.utils import range_boundaries
 import win32com.client as win32
 warnings.filterwarnings("ignore", category=UserWarning)
+import pythoncom
 
 class Excel_IO:
     def __init__(self):
@@ -62,51 +63,68 @@ class Excel_IO:
 
     def convert_excel_format(self,input_bytes, src_format, dst_format,save_dst=True):
         """根据参数将数据流中的excel格式进行转化，并输出为数据流,默认在temp文件夹中产生的临时文件"""
-        
+        pythoncom.CoInitialize()  # <--- 在此处初始化
+        try:
         # 清理之前的临时文件
-        clear_directory(self.temp_path)
+            clear_directory(self.temp_path)
+            
+            # 确保源格式和目标格式是受支持的
+            if src_format not in self.FORMATS or dst_format not in self.FORMATS:
+                raise ValueError('Unsupported format specified.')
+
+            src_tempfile_path=os.path.abspath(os.path.join(self.temp_path,f"temp.{src_format}"))
+            dst_tempfile_path=os.path.abspath(os.path.join(self.temp_path,f"temp.{dst_format}"))
+            
+            # 创建 Excel 对象
+            excel = win32.gencache.EnsureDispatch('Excel.Application')
+            excel.Visible = False  # 不显示Excel界面
+            
+            # 创建输出流
+            output_io = io.BytesIO()
+
+            # 将输入BytesIO对象中的内容写入临时源文件
+            with open(src_tempfile_path, "wb") as temp_file:
+                temp_file.write(input_bytes.getvalue())
+            # 打开源文件
+            workbook = excel.Workbooks.Open(os.path.abspath(src_tempfile_path))
+
+            # 另存为目标格式的文件
+            workbook.SaveAs(dst_tempfile_path, FileFormat=self.FORMATS[dst_format])
+            workbook.Close(True)
+
+            # 读取目标文件到BytesIO对象
+            with open(dst_tempfile_path, "rb") as temp_file:
+                output_io.write(temp_file.read())
+                
+            # 设置输出流的指针回到起始位置，以便于读取
+            output_io.seek(0)
+            
+            
+            # 清理临时文件
+            os.remove(src_tempfile_path)
+            
+            #在最后的保存excel步骤，可先保留文件至temp文件夹，再传输到用户选择的文件夹
+            if not save_dst:
+                os.remove(dst_tempfile_path)
+
+            # 关闭 Excel 进程
+            excel.Application.Quit()
+            
+            print("output_io:", output_io)
+            
+            return output_io
+            
+            
+        except Exception as e:
+            # 如果有错误发生，可以在这里处理
+            print(f"An error occurred: {e}")
+            
+        finally:
+            # 清理COM库
+            pythoncom.CoUninitialize()  # <--- 在此处取消初始化
+            
         
-        # 确保源格式和目标格式是受支持的
-        if src_format not in self.FORMATS or dst_format not in self.FORMATS:
-            raise ValueError('Unsupported format specified.')
-
-        src_tempfile_path=os.path.abspath(os.path.join(self.temp_path,f"temp.{src_format}"))
-        dst_tempfile_path=os.path.abspath(os.path.join(self.temp_path,f"temp.{dst_format}"))
         
-        # 创建 Excel 对象
-        excel = win32.gencache.EnsureDispatch('Excel.Application')
-        excel.Visible = False  # 不显示Excel界面
-        
-        # 创建输出流
-        output_io = io.BytesIO()
-
-        # 将输入BytesIO对象中的内容写入临时源文件
-        with open(src_tempfile_path, "wb") as temp_file:
-            temp_file.write(input_bytes.getvalue())
-        # 打开源文件
-        workbook = excel.Workbooks.Open(os.path.abspath(src_tempfile_path))
-
-        # 另存为目标格式的文件
-        workbook.SaveAs(dst_tempfile_path, FileFormat=self.FORMATS[dst_format])
-        workbook.Close(True)
-
-        # 读取目标文件到BytesIO对象
-        with open(dst_tempfile_path, "rb") as temp_file:
-            output_io.write(temp_file.read())
-
-        # 清理临时文件
-        os.remove(src_tempfile_path)
-        
-        #在最后的保存excel步骤，可先保留文件至temp文件夹，再传输到用户选择的文件夹
-        if not save_dst:
-            os.remove(dst_tempfile_path)
-
-        # 关闭 Excel 进程
-        excel.Application.Quit()
-
-        # 设置输出流的指针回到起始位置，以便于读取
-        output_io.seek(0)
-        return output_io
 
 
 class Excel_attribute:

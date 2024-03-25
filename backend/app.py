@@ -9,6 +9,7 @@ from utils import excel_processor
 import json
 import openpyxl as px
 
+
 app = Flask(__name__)
 CORS(app)
 
@@ -18,6 +19,7 @@ fileValidator = FileValidator()
 
 @app.route("/save_rawFile", methods=["POST"])
 def save_raw_file():
+    
     file = request.files.get("file")
     file_name = request.files.get("file").filename
     file_stream = io.BytesIO(file.read())
@@ -28,6 +30,7 @@ def save_raw_file():
             file_stream = excel_processor.Excel_IO().convert_excel_format(
                 file_stream, "xls", "xlsx", True
             )
+            print("file_stream:", file_stream)
 
         # 给file_rule_maker 的属性赋值
         fuker.get_file_stream(file_stream, file_name)
@@ -94,10 +97,12 @@ def load_and_check_data():
 
     new_excel = fileValidator.get_files_stream(excel_stream, excelFile_name, rule_dict)
     # print(new_excel)
-    _, checked_excel, error_index_col = fileValidator.validate_filled_excel(new_excel)
+    range_and_rule, checked_excel, error_index_col = fileValidator.validate_filled_excel(new_excel)
 
-    print("error_index_col", error_index_col)
+    print("range_and_rule", range_and_rule)
+    # print("error_index_col", error_index_col)
     checked_excel_error = {
+        "range_and_rule": range_and_rule,
         "error_index_col": error_index_col,
         "checked_excel": base64.b64encode(checked_excel.getvalue()).decode("utf-8"),
     }
@@ -112,36 +117,16 @@ def check_data():
     excelFile = request.files.get("excelFile")
     excel_stream = io.BytesIO(excelFile.read())
     
-    # with open("./tmp/checked_excel.xlsx", "wb") as f:
-        # f.write(excel_stream.getvalue())
-        
-    # wb = px.load_workbook(excel_stream)
-    # ws = wb.worksheets[0]
-    
-    # fileValidator.Xio.read_excel_file("./tmp/checked_excel.xlsx")
-
-    # new_excel = fileValidator.get_files_stream(excel_stream, "text.xlsx", {})
-    # # print(new_excel)
-
-    # _, checked_excel, error_index_col = fileValidator.validate_filled_excel(new_excel)
-
-    # print("excel_stream", excel_stream)
-    _, checked_excel, error_index_col = fileValidator.validate_filled_excel(
+    range_and_rule, checked_excel, error_index_col = fileValidator.validate_filled_excel(
         excel_stream
     )
+    
+    # print("error_index_col:", error_index_col)
     excel_stream.seek(0)
-    wb = px.load_workbook(excel_stream)
-    ws = wb.worksheets[1]
-    # 遍历工作表中的所有行
-    for row in ws.iter_rows(values_only=True):
-        # 对每一行的单元格值使用\t进行连接，形成一个字符串
-        row_data = '\t'.join([str(cell) if cell is not None else '' for cell in row])
-        # 打印该行，行间自然由print提供的\n进行分隔
-        print(row_data)
-        
-    print("error_index_col", error_index_col)
+    
     # 发送处理后的文件给前端
     checked_excel_error = {
+        "range_and_rule": range_and_rule,
         "error_index_col": error_index_col,
         "checked_excel": base64.b64encode(checked_excel.getvalue()).decode("utf-8"),
     }
