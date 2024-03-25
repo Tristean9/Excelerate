@@ -8,6 +8,10 @@ import router from "@/router/index.js";
 const store = useStore();
 const excelFile = ref(null);
 
+const goBack = () => {
+  router.back();
+}
+
 const handledFileSelection = event => {
   const files = event.target.files;
   if (files.length > 0) {
@@ -50,6 +54,7 @@ const uploadAndLoadExcelFile = async () => {
       <button @click="uploadAndLoadExcelFile">Open</button>
     </div>
   </div>
+  <button @click="goBack">return</button>
 </template>
 
 <style>

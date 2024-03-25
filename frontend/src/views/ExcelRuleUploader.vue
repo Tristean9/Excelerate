@@ -57,6 +57,10 @@ const uploadAndLoadExcelFile = async () => {
         console.error("请同时上传Excel文件和规则json文件!");
     }
 };
+
+const goBack = () => {
+    router.back();
+}
 </script>
 
 
@@ -68,6 +72,7 @@ const uploadAndLoadExcelFile = async () => {
         <input class="fileLoader" type="file" accept=".json" @change="handledRuleFileSelection" />
         <button @click="uploadAndLoadExcelFile">Open</button>
     </div>
+    <button @click="goBack">return</button>
 
 </template>
 

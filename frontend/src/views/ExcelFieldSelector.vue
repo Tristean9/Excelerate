@@ -25,8 +25,19 @@ const initSpread = (s) => {
   loadAndDisplayExcelContent(processedExcelBlob)
 
   bindCellClickForActiveSheet(); // 绑定事件到初始工作表
+  spread.value.bind(GC.Spread.Sheets.Events.CellClick, handleCellClick);
 
 };
+const selectedCellText = ref(''); // 用于存储选中单元格的文本内容
+
+const handleCellClick = (event, cellInfo) => {
+  if (spread.value && cellInfo.sheetArea === GC.Spread.Sheets.SheetArea.viewport) {
+    const sheet = spread.value.getActiveSheet();
+    const text = sheet.getText(cellInfo.row, cellInfo.col);
+    selectedCellText.value = text;
+  }
+};
+
 
 const loadAndDisplayExcelContent = async (processedExcelBlob) => {
   const options = {
@@ -72,9 +83,29 @@ const bindCellClickForActiveSheet = () => {
   // 绑定SelectionChanged事件到当前工作表
   sheet.bind(GC.Spread.Sheets.Events.SelectionChanged, (sender, args) => {
     const selections = sheet.getSelections();
+    let isInvalidSelection = false;
+
     selections.forEach((range) => {
       for (let r = range.row; r < range.row + range.rowCount; r++) {
         for (let c = range.col; c < range.col + range.colCount; c++) {
+          // 检查单元格是否是合并单元格的一部分
+          const span = sheet.getSpan(r, c);
+          if (span && (span.row === r && span.col === c)) {
+            alert('不可以选中合并的单元格');
+            isInvalidSelection = true;
+            break;
+          }
+          // 检查单元格是否为空
+          const cellValue = sheet.getValue(r, c);
+          if (cellValue === null || cellValue === '') {
+            alert('不可以选中空单元格');
+            isInvalidSelection = true;
+            break;
+          }
+          if (isInvalidSelection) {
+            break;
+          }
+
           const position = GC.Spread.Sheets.CalcEngine.rangeToFormula(sheet.getRange(r, c, 1, 1), r, c, GC.Spread.Sheets.CalcEngine.RangeReferenceRelative.allRelative);
           const fieldName = sheet.getValue(r, c);
 
@@ -86,9 +117,12 @@ const bindCellClickForActiveSheet = () => {
             // 如果不希望在选择时弹出警告，可以注释掉下面的alert
             alert(`位置 ${position} 已经被选中`);
           }
+
         }
       }
+
     });
+
   })
 }
 
@@ -149,6 +183,10 @@ onBeforeRouteLeave((to, from, next) => {
           <!--<button @click="toggleFontColor" > 切换字体颜色</button>
           <button @click="toggleHighlightCells">切换背景高亮</button>-->
         </div>
+        <div class="detail-box" v-if="selectedCellText">
+          <!-- 这里显示选中单元格的文本内容 -->
+          <div class="cell-details">{{ selectedCellText }}</div>
+        </div>
         <gc-spread-sheets :hostStyle="spreadStyles" @workbookInitialized="initSpread">
           <gc-worksheet></gc-worksheet>
         </gc-spread-sheets>
@@ -190,6 +228,15 @@ onBeforeRouteLeave((to, from, next) => {
 
 #excel-area {
   margin-bottom: 20px;
+}
+
+.detail-box {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #000;
 }
 
 #tip-container {

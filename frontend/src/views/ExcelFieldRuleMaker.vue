@@ -111,7 +111,7 @@ const handleDelete = (position) => {
     </div>
     <div id="final-rules">
       <h1>最终规则</h1>
-      <h1>{{ selectedDropdowns }}</h1>
+      <!-- <h1>{{ selectedDropdowns }}</h1> -->
       <ul>
         <li v-for="(entry, position) in selectedDropdowns" :key="position">
           {{ position }} - {{ entry.category }}
@@ -129,10 +129,13 @@ const handleDelete = (position) => {
 <style scoped>
 #rule-maker-container {
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   /* 让子元素靠近两端 */
   padding: 0 50px;
   /* 设置内边距为20像素，可以调整这个数值来控制边距大小 */
+}
+#rule-maker-container >  #rule-maker {
+  margin-right: 200px; /* 或者你想要的具体数值 */
 }
 
 #rule-maker {

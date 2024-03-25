@@ -53,8 +53,6 @@ dependencies:
   - psutil=5.9.8=py312he70551f_0
   - pure_eval=0.2.2=pyhd8ed1ab_0
   - pygments=2.17.2=pyhd8ed1ab_0
-  - pyinstaller=6.4.0=py312h3bd2d22_0
-  - pyinstaller-hooks-contrib=2024.1=pyhd8ed1ab_0
   - python=3.12.2=h2628c8c_0_cpython
   - python-dateutil=2.8.2=pyhd8ed1ab_0
   - python_abi=3.12=4_cp312
@@ -126,6 +124,8 @@ dependencies:
     - prometheus-client==0.20.0
     - prompt-toolkit==3.0.43
     - pycparser==2.21
+    - pyinstaller==6.5.0
+    - pyinstaller-hooks-contrib==2024.3
     - python-json-logger==2.0.7
     - pywin32==306
     - pywinpty==2.0.12

@@ -20,7 +20,8 @@ class FileRuleMaker:#进一步：考虑将Xio对象作为FileRuleMaker的属性�
         self.file_rule_dict=dict()              #create_final_rules_and_examples中修改
         self.final_excel_by_mode=dict()         #create_final_rules_and_examples中修改
         #一开始即创建，然后在整个类均可调用
-        self.Xio=XPRO.Excel_IO()                                                    #自动创建，读写全部用这个对象读取。
+        self.Xio=XPRO.Excel_IO()     
+        #自动创建，读写全部用这个对象读取。
         self.predefined_rules_path="rules/predefined_rules.json"                    #预定义规则文件的位置
         self.predefined_rules=XPRO.read_from_json_file(self.predefined_rules_path)  #预定义规则对象
         self.rule_choice_sepaprator=","                                             #进一步：考虑后端存储列表类型相关内容，传给前端的是join为字符串的内容，默认以英文逗号间隔同一规则内的各个选项，可用户自定义修改
