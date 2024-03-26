@@ -177,16 +177,17 @@ onBeforeRouteLeave((to, from, next) => {
     <div class="title-text">规则字段选择页面</div>
   </div>
   <div>
-    <div class="excel-tip">
-      <div id="excel-area">
+    <div class="excel-container">
+      <div class="excel-area">
         <div id="excel-tools">
           <!--<button @click="toggleFontColor" > 切换字体颜色</button>
           <button @click="toggleHighlightCells">切换背景高亮</button>-->
+          <div class="detail-box" v-if="selectedCellText">
+            <!-- 这里显示选中单元格的文本内容 -->
+            <div class="cell-details">{{ selectedCellText }}</div>
+          </div>
         </div>
-        <div class="detail-box" v-if="selectedCellText">
-          <!-- 这里显示选中单元格的文本内容 -->
-          <div class="cell-details">{{ selectedCellText }}</div>
-        </div>
+
         <gc-spread-sheets :hostStyle="spreadStyles" @workbookInitialized="initSpread">
           <gc-worksheet></gc-worksheet>
         </gc-spread-sheets>
@@ -220,24 +221,13 @@ onBeforeRouteLeave((to, from, next) => {
 </template>
 
 <style scoped>
-.excel-tip {
-  display: flex;
-  margin: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+
 
 #excel-area {
   margin-bottom: 20px;
 }
 
-.detail-box {
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f9f9f9;
-  color: #000;
-}
+
 
 #tip-container {
   margin-top: 20px;

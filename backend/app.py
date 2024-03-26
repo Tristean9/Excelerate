@@ -8,10 +8,11 @@ from io import BytesIO
 from utils import excel_processor
 import json
 import openpyxl as px
-
+import logging
 
 app = Flask(__name__)
 CORS(app)
+app.logger.setLevel(logging.INFO)
 
 fuker = FileRuleMaker()
 fileValidator = FileValidator()
@@ -19,13 +20,14 @@ fileValidator = FileValidator()
 
 @app.route("/save_rawFile", methods=["POST"])
 def save_raw_file():
-    
+
     file = request.files.get("file")
     file_name = request.files.get("file").filename
     file_stream = io.BytesIO(file.read())
 
     if file:
         # 转换处理
+
         if file_name.endswith(".xls"):
             file_stream = excel_processor.Excel_IO().convert_excel_format(
                 file_stream, "xls", "xlsx", True
@@ -97,7 +99,9 @@ def load_and_check_data():
 
     new_excel = fileValidator.get_files_stream(excel_stream, excelFile_name, rule_dict)
     # print(new_excel)
-    range_and_rule, checked_excel, error_index_col = fileValidator.validate_filled_excel(new_excel)
+    range_and_rule, checked_excel, error_index_col = (
+        fileValidator.validate_filled_excel(new_excel)
+    )
 
     print("range_and_rule", range_and_rule)
     # print("error_index_col", error_index_col)
@@ -116,14 +120,14 @@ def check_data():
     # print("request.files",request.files)
     excelFile = request.files.get("excelFile")
     excel_stream = io.BytesIO(excelFile.read())
-    
-    range_and_rule, checked_excel, error_index_col = fileValidator.validate_filled_excel(
-        excel_stream
+
+    range_and_rule, checked_excel, error_index_col = (
+        fileValidator.validate_filled_excel(excel_stream)
     )
-    
+
     # print("error_index_col:", error_index_col)
     excel_stream.seek(0)
-    
+
     # 发送处理后的文件给前端
     checked_excel_error = {
         "range_and_rule": range_and_rule,
@@ -136,4 +140,4 @@ def check_data():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

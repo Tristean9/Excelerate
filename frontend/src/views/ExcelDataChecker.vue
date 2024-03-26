@@ -33,7 +33,7 @@ const currentErrorAndReason = computed(() => {
     currentErrorPosition.value.forEach((position) => {
         // console.log("position:", position.toLowerCase());
         // console.log("positionRule:", Object.keys(positionRule.value));
-        if (Object.keys(positionRule.value).includes( position.toLowerCase()))  {
+        if (Object.keys(positionRule.value).includes(position.toLowerCase())) {
             // console.log("positionRule.value[position:",positionRule.value[position.toLowerCase()]);
             subset[position.toLowerCase()] = positionRule.value[position.toLowerCase()][1];
         }
@@ -46,7 +46,18 @@ console.log("currentErrorAndReason:", currentErrorAndReason.value);
 const initSpread = (s) => {
     spread.value = s;
     loadAndDisplayExcelContent(currentExcelBlob)
+    spread.value.bind(GC.Spread.Sheets.Events.CellClick, handleCellClick);
 }
+
+const selectedCellText = ref(''); // 用于存储选中单元格的文本内容
+
+const handleCellClick = (event, cellInfo) => {
+    if (spread.value && cellInfo.sheetArea === GC.Spread.Sheets.SheetArea.viewport) {
+        const sheet = spread.value.getActiveSheet();
+        const text = sheet.getText(cellInfo.row, cellInfo.col);
+        selectedCellText.value = text;
+    }
+};
 
 const loadAndDisplayExcelContent = async (checkedExcelBlob) => {
 
@@ -161,16 +172,31 @@ const cancelSave = () => {
     isModalVisible1.value = false;
     console.log('取消保存');
 }
-
+const goBack = () => {
+    router.back();
+}
 
 </script>
 
 
 <template>
-    <div id="excel-shower-container">
-        <gc-spread-sheets :hostStyle="spreadStyles" @workbookInitialized="initSpread">
-            <gc-worksheet></gc-worksheet>
-        </gc-spread-sheets>
+    <div class="title-container">
+        <div class="title-text">数据检验页面</div>
+    </div>
+    <div class="excel-container">
+        <div class="excel-area">
+            <div id="excel-tools">
+                <!--<button @click="toggleFontColor" > 切换字体颜色</button>
+            <button @click="toggleHighlightCells">切换背景高亮</button>-->
+                <div class="detail-box" v-if="selectedCellText">
+                    <!-- 这里显示选中单元格的文本内容 -->
+                    <div class="cell-details">{{ selectedCellText }}</div>
+                </div>
+            </div>
+            <gc-spread-sheets :hostStyle="spreadStyles" @workbookInitialized="initSpread">
+                <gc-worksheet></gc-worksheet>
+            </gc-spread-sheets>
+        </div>
         <div id="tip-button">
             <h2>请点击检查按钮进行数据检验</h2>
             <button @click="checkExcelData">检查</button>
@@ -199,18 +225,25 @@ const cancelSave = () => {
             <p>您的数据经检查已无问题，正在为您保存</p>
         </div>
     </div>
+    <button @click="goBack">return</button>
 
 </template>
 
 
 <style scoped>
-#excel-shower-container {
-    display: flex;
+.gc-spread-sheets {
+    /* margin-right: 200px;  */
+}
+
+.table {
+    width: 100%;
 }
 
 #tip-button {
     display: flex;
     flex-direction: column;
+    margin-left: 20px;
+    width: 200px
 }
 
 .modal {

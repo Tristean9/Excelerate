@@ -1,5 +1,5 @@
 // router/index.js
-import { createRouter, createWebHistory} from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import Demo from "@/components/demo.vue";
 import ExcelFieldRuleMaker from "@/views/ExcelFieldRuleMaker.vue";
 import ExcelFieldSelector from "@/views/ExcelFieldSelector.vue";
@@ -11,15 +11,18 @@ import ExcelDataChecker from "@/views/ExcelDataChecker.vue";
 import Home from "@/views/Home.vue";
 
 const routes = [
-    {   path: "/",
+    {
+        path: "/",
         name: "Home",
         component: Home
     },
-    {   path: "/excel-file-uploader",
+    {
+        path: "/excel-file-uploader",
         name: "ExcelFileUploader",
         component: ExcelFileUploader
     },
-    {   path: '/excel-field-selector',
+    {
+        path: '/excel-field-selector',
         name: 'ExcelFieldSelector',
         component: ExcelFieldSelector
     },
@@ -46,7 +49,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes,
 });
 
