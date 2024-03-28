@@ -81,8 +81,11 @@ def create_final_rules_and_examples_file():
         byte_stream.seek(0)  # 跳转到流的开头
 
         # 将数据流转换为Base64编码的字符串
-        file_data[mode] = [base64.b64encode(byte_stream.getvalue()).decode("utf-8"), final_rules_and_examples[mode]]
-        
+        file_data[mode] = [
+            base64.b64encode(byte_stream.getvalue()).decode("utf-8"),
+            final_rules_and_examples[mode],
+        ]
+
     # print("file_data", file_data)
     return jsonify(file_data), 200
 
@@ -92,11 +95,11 @@ def load_and_check_data():
     excelFile = request.files.get("excelFile")
     excel_stream = io.BytesIO(excelFile.read())
     excelFile_name = excelFile.filename
-    
+
     if excelFile_name.endswith(".xls"):
-            excelFile_name = excel_processor.Excel_IO().convert_excel_format(
-                excelFile_name, "xls", "xlsx", True
-            )
+        excelFile_name = excel_processor.Excel_IO().convert_excel_format(
+            excelFile_name, "xls", "xlsx", True
+        )
 
     ruleFile = request.files.get("ruleFile")
 
@@ -110,7 +113,7 @@ def load_and_check_data():
     )
 
     # print("range_and_rule", range_and_rule)
-    
+
     # print("error_index_col", error_index_col)
     checked_excel_error = {
         "range_and_rule": range_and_rule,
@@ -147,4 +150,4 @@ def check_data():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=1129)

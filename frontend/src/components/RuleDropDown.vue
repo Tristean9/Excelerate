@@ -17,8 +17,8 @@ const props = defineProps({
 
 
 // console.log("props.defaultSelections ", props.defaultSelections);
-console.log("props.entries['对应列下拉列表规则'] ", props.entries['对应列下拉列表规则']);
-console.log("props.entries['程序预定义规则'] ", props.entries['程序预定义规则']);
+// console.log("props.entries['对应列下拉列表规则'] ", props.entries['对应列下拉列表规则']);
+// console.log("props.entries['程序预定义规则'] ", props.entries['程序预定义规则']);
 
 // 使用emit发送事件
 const emit = defineEmits(['save', 'delete']);

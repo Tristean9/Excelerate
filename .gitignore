@@ -26,3 +26,5 @@ electron/release-builds/myDesktopApp-win32-x64/resources/app/public/assets/index
 electron/release-builds/myDesktopApp-win32-x64/resources/app/public/assets/index-Bf7IzjCn.js
 electron/release-builds/myDesktopApp-win32-x64/resources/app/rules/predefined_rules.json
 electron/resources/app.exe
+electron/release-builds/myDesktopApp-win32-x64.zip
+electron/release-builds/myDesktopApp-win32-x64/resources/app/rules/predefined_rules.json
