@@ -21,3 +21,8 @@ backend/app.spec
 electron/release-builds/
 
 .gitignore
+electron/release-builds/myDesktopApp-win32-x64.zip
+electron/release-builds/myDesktopApp-win32-x64/resources/app/public/assets/index-b5KvW3J8.css
+electron/release-builds/myDesktopApp-win32-x64/resources/app/public/assets/index-Bf7IzjCn.js
+electron/release-builds/myDesktopApp-win32-x64/resources/app/rules/predefined_rules.json
+electron/resources/app.exe

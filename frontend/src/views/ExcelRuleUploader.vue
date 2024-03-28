@@ -84,7 +84,7 @@ const uploadAndLoadExcelFile = async () => {
 };
 
 const goBack = () => {
-    router.back();
+    router.push({ name: 'Home' });
 }
 </script>
 

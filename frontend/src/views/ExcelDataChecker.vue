@@ -1,6 +1,6 @@
 <script setup>
 
-import { ref, watch, computed, nextTick } from 'vue';
+import { ref, computed } from 'vue';
 
 import router from "@/router/index.js";
 import store from "@/store/index.js";
@@ -13,7 +13,7 @@ import '@grapecity/spread-sheets-io';
 import * as GC from '@grapecity/spread-sheets'
 
 const spread = ref(null);
-const spreadStyles = { width: "1000px", height: "600px" };
+const spreadStyles = { width: "1200px", height: "600px" };
 
 
 const checkedExcelBlob = computed(() => store.state.checkedExcelBlob); // 从上个上传页面计算得来
@@ -153,6 +153,7 @@ const saveExcel = () => {
     } else {
         isModalVisible2.value = true
         confirmSave();
+
     }
 }
 
@@ -162,6 +163,10 @@ const confirmSave = () => {
     isModalVisible1.value = false;
     spread.value.export((blob) => {
         saveAs(blob, 'ddd.xlsx')
+        // 设置一个定时器，延时关闭模态框
+        setTimeout(() => {
+            isModalVisible2.value = false;
+        }, 3000); // 这里的3000表示模态框将在3秒后消失
     }, (error) => {
         console.error("error: ", error)
     }, {})
@@ -173,7 +178,7 @@ const cancelSave = () => {
     console.log('取消保存');
 }
 const goBack = () => {
-    router.back();
+    router.push({ name: 'ExcelRuleUploader' });
 }
 
 </script>
@@ -206,7 +211,7 @@ const goBack = () => {
                 <h3>{{ currentErrorAndReason }}</h3>
             </template>
             <template v-else>
-                <h2>您的代码经检验已无问题</h2>
+                <h2>您的数据经检验已无问题</h2>
                 <!-- <h3>{{ currentErrorPosition }}</h3> -->
             </template>
             <button @click="saveExcel">保存</button>
@@ -265,4 +270,5 @@ const goBack = () => {
     border-radius: 5px;
     text-align: center;
 }
+
 </style>

@@ -3,41 +3,42 @@ import { useStore } from "vuex";
 import { computed, reactive, ref, onBeforeUnmount, onMounted } from "vue";
 import http from "@/api/http.js";
 import router from "@/router/index.js";
+import { onBeforeRouteLeave } from 'vue-router';
 
 import RuleDropDown from "@/components/RuleDropDown.vue";
 
 const store = useStore();
-const rulesData = computed(() => store.state.rulesData);
-// console.log("rulesData: ", rulesData)
+const rulesData = computed(() => store.state.rulesData); // 保存从规则字段选择页面的返回的规则数据
+console.log("rulesData: ", rulesData.value)
 
-const finalRules = ref({});
-const preSelectedDropDowns = computed(() => store.state.preSelectedDropDowns);
+// const finalRules = ref({});
+const preSelectedDropDowns = computed(() => store.state.preSelectedDropDowns); //  保存之前选过的选项
 // 保存其中的选项
 const selectedDropdowns = reactive({});
 
 const goBack = () => {
   store.dispatch('savePreSelectedDropDowns', selectedDropdowns)
-  router.back();
+  router.push({ name: 'ExcelFieldSelector' });
 }
 
 onMounted(() => {
-  console.log('rulesData', rulesData.value);
+  // console.log('rulesData', rulesData.value);
 
   // 在页面加载时检查是否有之前保存的选项
   if (preSelectedDropDowns.value) {
     Object.keys(rulesData.value).forEach(position => {
       if (preSelectedDropDowns.value[position]) {
-        console.log('preSelectedDropDowns.value[position]', preSelectedDropDowns.value[position]);
+        // console.log('preSelectedDropDowns.value[position]', preSelectedDropDowns.value[position]);
         selectedDropdowns[position] = preSelectedDropDowns.value[position];
-        console.log("Mounted - Initial selectedDropdowns:", selectedDropdowns[position]);
+        // console.log("Mounted - Initial selectedDropdowns:", selectedDropdowns[position]);
       }
     });
   }
-  
+
 });
 
 onBeforeUnmount(() => {
-  console.log(111);
+  // console.log(111);
   // 页面卸载前保存当前选择
   store.dispatch('savePreSelectedDropDowns', selectedDropdowns);
   // console.log("Before unmount - Current selectedDropdowns:", selectedDropdowns);
@@ -57,28 +58,39 @@ const sendFinalFormattedRules = async () => {
 
   formData.append('finalRules', rulesString);
 
-  const fileStreamResponse = await http.post('create_final_rules_and_examples', formData);
+  const response = await http.post('create_final_rules_and_examples', formData);
 
   // 处理包含Base64编码数据的响应
-  const response = fileStreamResponse.data
-  //将Base64编码文件转换成Blob对象
-  const fileBlobData = {};
-  for (const [mode, base64String] of Object.entries(response)) {
-    const byteCharacters = atob(base64String);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    fileBlobData[mode] = new Blob([byteArray], { type: 'application/vnd.ms-excel' });
-  }
+  // 将Base64编码文件转换成Blob对象
   // console.log('dataResponse: ', dataResponse.data);
   // console.log('fileStreamResponse: ', fileBlobData);
+  const excelAndRuleData = {};
+  for (const [mode, entry] of Object.entries(response.data)) {
+    const base64String = entry[0]
+    const ruleDict = entry[1]
+    console.log("base64String",base64String);
+    console.log("ruleDict", ruleDict);
+    excelAndRuleData[mode] = [base64ToBlob(base64String, 'application/vnd.ms-excel'), ruleDict];
+  }
 
-  await store.dispatch('fetchFinalExcelData', fileBlobData);
+  await store.dispatch('fetchExcelAndRuleData', excelAndRuleData);
   // console.log(computed(() => store.state.finalExcelBlob).value);
 
   await router.push({ name: 'ExcelFieldRuleShower' });
+}
+
+const base64ToBlob = (base64, mimeType) => {
+  // 解码 Base64 字符串
+  const byteCharacters = atob(base64);
+  // 每个字符的编码存入一个数组
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  // 转换为类型化数组
+  const byteArray = new Uint8Array(byteNumbers);
+  // 使用类型化数组创建 Blob 对象
+  return new Blob([byteArray], { type: mimeType });
 }
 
 const handleSave = ({ position, entry }) => {
@@ -90,9 +102,22 @@ const handleSave = ({ position, entry }) => {
 
 const handleDelete = (position) => {
   delete selectedDropdowns[position]
+  delete rulesData[position];
   // console.log("selectedDropdowns:", selectedDropdowns);
   store.dispatch('deleteRule', position)
 }
+
+// 监听路由离开事件
+onBeforeRouteLeave((to, from, next) => {
+  if (to.name === 'ExcelFieldSelector') {
+    // 存储已经制定好的规则字段
+    // console.log("rulesData", rulesData);
+    store.dispatch('savePreSelectedField', rulesData);
+  }
+  // 继续路由跳转
+  next();
+});
+
 </script>
 
 <template>
@@ -115,7 +140,7 @@ const handleDelete = (position) => {
       <ul>
         <li v-for="(entry, position) in selectedDropdowns" :key="position">
           {{ position }} - {{ entry.category }}
-          <span>{{ entry.resultArray.join(', ') }}</span>
+          <span class="final-rule">{{ entry.resultArray.join(', ') }}</span>
         </li>
       </ul>
       <button @click="sendFinalFormattedRules">保存并发送</button>
@@ -129,20 +154,33 @@ const handleDelete = (position) => {
 <style scoped>
 #rule-maker-container {
   display: flex;
+  min-width: 1200px; /* 根据需要调整 */
   /* justify-content: space-between; */
   /* 让子元素靠近两端 */
   padding: 0 50px;
   /* 设置内边距为20像素，可以调整这个数值来控制边距大小 */
 }
-#rule-maker-container >  #rule-maker {
-  margin-right: 200px; /* 或者你想要的具体数值 */
-}
+
 
 #rule-maker {
   height: 500px;
+  min-width: 500px;
   display: flex;
   flex-direction: column;
   overflow: auto;
+}
+#rule-maker,
+#final-rules {
+  flex: 1; /* 每个子元素都将尝试占据相同的空间 */
+  min-width: 0; /* 防止缩小到小于内容宽度 */
+  overflow: auto; /* 如果内容超出，隐藏超出的部分 */
+}
+
+
+.final-rule {
+  max-width: 150px;
+  overflow: auto;
+  white-space: nowrap;
 }
 
 .dropdowns {
@@ -154,6 +192,7 @@ const handleDelete = (position) => {
 .dropdowns>div {
   margin: 0.5rem 0;
 }
+
 
 li {
   list-style: none;

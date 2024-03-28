@@ -12,11 +12,12 @@ import { saveAs } from 'file-saver';
 
 const currentMode = ref('2-2');
 const spread = ref(null);
-const spreadStyles = { width: '1000px', height: '600px' };
-// 存储所有的excelBlob;
-const finalExcelBlob = computed(() => store.state.finalExcelBlob);
+const spreadStyles = { width: '1200px', height: '600px' };
+
+const excelAndRuleData = computed(() => store.state.excelAndRuleData)
+
 // 存储当前的excelBlob;
-const currentExcelBlob = ref(finalExcelBlob.value[currentMode.value])
+const currentExcelAndRule = ref(excelAndRuleData.value[currentMode.value])
 // console.log(currentExcelBlob.value)
 
 const modeText = {
@@ -30,8 +31,9 @@ const initSpread = (s) => {
   spread.value = s;
   // console.log(currentMode.value)
   // console.log(currentExcelBlob.value)
-  if (currentExcelBlob.value) {
-    loadAndDisplayExcelContent(currentExcelBlob)
+  if (currentExcelAndRule.value) {
+    console.log("currentExcelAndRule.value[0]",currentExcelAndRule.value[0]);
+    loadAndDisplayExcelContent(currentExcelAndRule.value[0])
   }
   spread.value.bind(GC.Spread.Sheets.Events.CellClick, handleCellClick);
 }
@@ -57,7 +59,7 @@ const loadAndDisplayExcelContent = async (blob) => {
     spread.value.clearSheets();
     spread.value.suspendPaint();
     // const excelIO = new ExcelIO.IO();
-    spread.value.import(blob.value, () => {
+    spread.value.import(blob, () => {
       // spread.value.fromJSON(json);
 
       // 设置表格显示大小
@@ -82,25 +84,35 @@ const loadAndDisplayExcelContent = async (blob) => {
 
 const switchMode = (newMode) => {
   currentMode.value = newMode;
-  currentExcelBlob.value = finalExcelBlob.value[currentMode.value];
-  loadAndDisplayExcelContent(currentExcelBlob)
+  currentExcelAndRule.value = excelAndRuleData.value[currentMode.value];
+  loadAndDisplayExcelContent(currentExcelAndRule.value[0])
 }
 
 
-const saveCurrentExcelFile = () => {
-  const options = {
-    // includeStyles: true,
+const saveCurrentExcelAndJsonFile = () => {
+  saveRuleFile();
+  saveExcelFile();
+}
 
-  }
+const saveRuleFile = () => {
+  const jsonString = JSON.stringify(currentExcelAndRule.value[1], null, 2);
+    // 创建一个Blob对象，指定内容类型为JSON
+    const blob = new Blob([jsonString], { type: "application/json" });
+      // 使用saveAs函数保存文件，文件名为example.json
+    saveAs(blob, "rule.json");
+}
+
+const saveExcelFile = () => {
   spread.value.export((blob) => {
-    saveAs(blob, 'ddd.xlsx')
+    saveAs(blob, 'processed.xlsx');
   }, (error) => {
-    console.error("error: ", error)
-  }, options)
-
+    console.error("error: ", error);
+  }, {});
 }
+
+
 const goBack = () => {
-  router.back();
+  router.push({ name: 'ExcelFieldRuleMaker' });
 }
 
 </script>
@@ -128,10 +140,10 @@ const goBack = () => {
         <div class="tip-text-container">
           <h2>请选择你需要展示的表格的模式</h2>
         </div>
-        <button v-for="mode in Object.keys(store.state.finalExcelBlob)" :key="mode" @click="switchMode(mode)"> {{
+        <button v-for="mode in Object.keys(store.state.excelAndRuleData)" :key="mode" @click="switchMode(mode)"> {{
           modeText[mode]
         }}</button>
-        <button @click="saveCurrentExcelFile">save</button>
+        <button @click="saveCurrentExcelAndJsonFile">save</button>
       </div>
   </div>
 

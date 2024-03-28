@@ -1,9 +1,8 @@
 // router/index.js
 import { createRouter, createWebHashHistory } from "vue-router";
-import Demo from "@/components/demo.vue";
 import ExcelFieldRuleMaker from "@/views/ExcelFieldRuleMaker.vue";
-import ExcelFieldSelector from "@/views/ExcelFieldSelector.vue";
 import ExcelFileUploader from "@/views/ExcelFileUploader.vue";
+import ExcelFieldSelector from "@/views/ExcelFieldSelector.vue";
 import ExcelFieldRuleShower from "@/views/ExcelFieldRuleShower.vue";
 
 import ExcelRuleUploader from "@/views/ExcelRuleUploader.vue";

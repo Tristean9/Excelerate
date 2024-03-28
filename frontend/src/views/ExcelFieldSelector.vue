@@ -13,23 +13,39 @@ import * as GC from '@grapecity/spread-sheets'
 
 
 const spread = ref(null);
-const spreadStyles = { width: "1000px", height: "600px" };
+const spreadStyles = { width: "1200px", height: "600px" };
 
-const selectedFields = ref([]);
-const rulesData = computed(() => store.state.rulesData);
+
+const preSelectedField2 = computed(() => {
+  let fields = [];
+  if (store.state.preSelectedField){
+    for (const [position, entry] of Object.entries(store.state.preSelectedField)){
+      fields.push({"position":position, "fieldName":entry[0]});
+    }
+  }
+  // console.log("fields", fields);
+  return fields
+  });
+// console.log("preSelectedField", preSelectedField.value);
+const selectedFields = ref(preSelectedField2.value);
+// console.log("selectedFields", selectedFields.value);
+
 const processedExcelBlob = computed(() => store.state.processedExcelBlob)
 
 const initSpread = (s) => {
   spread.value = s;
 
-  loadAndDisplayExcelContent(processedExcelBlob)
-
+  if (spread.value) {
+    loadAndDisplayExcelContent(processedExcelBlob)
+  }
   bindCellClickForActiveSheet(); // 绑定事件到初始工作表
   spread.value.bind(GC.Spread.Sheets.Events.CellClick, handleCellClick);
 
 };
+
 const selectedCellText = ref(''); // 用于存储选中单元格的文本内容
 
+// 获取当前选中的单元格的内容
 const handleCellClick = (event, cellInfo) => {
   if (spread.value && cellInfo.sheetArea === GC.Spread.Sheets.SheetArea.viewport) {
     const sheet = spread.value.getActiveSheet();
@@ -38,36 +54,38 @@ const handleCellClick = (event, cellInfo) => {
   }
 };
 
-
+// 加载并展示Excel内容
 const loadAndDisplayExcelContent = async (processedExcelBlob) => {
   const options = {
     includeStyles: true,
     includeFormulas: true,
   }
   if (processedExcelBlob.value) {
-    spread.value.import(processedExcelBlob.value, () => {
-      for (let i = 0; i < spread.value.getSheetCount(); i++) {
-        let sheet = spread.value.getSheet(i);
-        sheet.options.isProtected = true; // 设置每个工作表为保护状态
-      }
-      const sheet = spread.value.getActiveSheet();
-      const minRowCount = 50;
-      const minColumnCount = 50;
+    if (spread.value) {
+      spread.value.import(processedExcelBlob.value, () => {
+        for (let i = 0; i < spread.value.getSheetCount(); i++) {
+          let sheet = spread.value.getSheet(i);
+          sheet.options.isProtected = true; // 设置每个工作表为保护状态
+        }
+        const sheet = spread.value.getActiveSheet();
+        const minRowCount = 50;
+        const minColumnCount = 50;
 
-      if (sheet.getRowCount() < minRowCount) {
-        sheet.setRowCount(minRowCount)
-      }
+        if (sheet.getRowCount() < minRowCount) {
+          sheet.setRowCount(minRowCount)
+        }
 
-      if (sheet.getColumnCount() < minColumnCount) {
-        sheet.setColumnCount(minColumnCount)
-      }
+        if (sheet.getColumnCount() < minColumnCount) {
+          sheet.setColumnCount(minColumnCount)
+        }
 
 
-      bindCellClickForActiveSheet(); // 绑定事件到初始工作表
+        bindCellClickForActiveSheet(); // 绑定事件到初始工作表
 
-    }, (error) => {
-      console.error("Import failed: ", error)
-    }, options);
+      }, (error) => {
+        console.error("Import failed: ", error)
+      }, options);
+    }
   }
 }
 
@@ -87,6 +105,9 @@ const bindCellClickForActiveSheet = () => {
 
     selections.forEach((range) => {
       for (let r = range.row; r < range.row + range.rowCount; r++) {
+        if (isInvalidSelection){
+          break
+        }
         for (let c = range.col; c < range.col + range.colCount; c++) {
           // 检查单元格是否是合并单元格的一部分
           const span = sheet.getSpan(r, c);
@@ -112,10 +133,11 @@ const bindCellClickForActiveSheet = () => {
           const isPositionExist = selectedFields.value.some(item => item.position === position);
 
           if (!isPositionExist) {
-            selectedFields.value.push({ position, fieldName });
+            selectedFields.value.push({ 'position':position, "fieldName":fieldName });
           } else {
             // 如果不希望在选择时弹出警告，可以注释掉下面的alert
             alert(`位置 ${position} 已经被选中`);
+            break
           }
 
         }
@@ -137,6 +159,7 @@ const sendFiledNames = async () => {
     await store.dispatch('fetchRulesData', response.data);
     // console.log("服务器响应：", response.data);
 
+    const rulesData = computed(() => store.state.rulesData);
     if (rulesData.value) {
       // 跳转到规则指定模块
       // console.log(rulesData.value)
@@ -149,7 +172,7 @@ const sendFiledNames = async () => {
 };
 
 const goBack = () => {
-  router.back();
+  router.push({ name: 'ExcelFileUploader'});
 }
 
 // 检测state变化
@@ -162,13 +185,16 @@ watch(processedExcelBlob, (newVal, oldVal) => {
 
 // 监听路由离开事件
 onBeforeRouteLeave((to, from, next) => {
-  if (to.name === 'excelFiledUploader') {
+  if (to.name === 'ExcelFileUploader') {
+
     // 调用重置数据的方法
-    selectedFields.value = [];
+    store.dispatch('savePreSelectedField', computed(() => {}));
+    store.dispatch('savePreSelectedDropDowns',{});
   }
   // 继续路由跳转
   next();
 });
+
 
 </script>
 
@@ -221,8 +247,6 @@ onBeforeRouteLeave((to, from, next) => {
 </template>
 
 <style scoped>
-
-
 #excel-area {
   margin-bottom: 20px;
 }
@@ -230,7 +254,8 @@ onBeforeRouteLeave((to, from, next) => {
 
 
 #tip-container {
-  margin-top: 20px;
+  margin: 0 20px
+
 }
 
 input[type="file"] {

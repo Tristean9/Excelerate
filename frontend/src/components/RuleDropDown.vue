@@ -16,8 +16,10 @@ const props = defineProps({
 });
 
 
-// console.log("props.entries ", props.entries);
-// console.log("props.entries['对应列下拉列表规则'] ", props.entries['对应列下拉列表规则']);
+// console.log("props.defaultSelections ", props.defaultSelections);
+console.log("props.entries['对应列下拉列表规则'] ", props.entries['对应列下拉列表规则']);
+console.log("props.entries['程序预定义规则'] ", props.entries['程序预定义规则']);
+
 // 使用emit发送事件
 const emit = defineEmits(['save', 'delete']);
 
@@ -35,6 +37,7 @@ const dropdown1Options = computed(() => {
 });
 
 const dropdown2Options = computed(() => {
+    
     return props.entries['程序预定义规则'].map(option => ({
         label: option.join('，'),
         value: option.join('，')
@@ -43,19 +46,22 @@ const dropdown2Options = computed(() => {
 
 // 如果存在默认选择，设置下拉框的值
 watchEffect(() => {
-    console.log("watchEffect - defaultSelections changed:", props.defaultSelections);
+    // console.log("watchEffect - defaultSelections changed:", props.defaultSelections);
     if (props.defaultSelections) {
+        // console.log("props.defaultSelections");
         // 如果存在默认选择，并且确实有为 selectedRule1 的值，则更新它
-        if (props.defaultSelections.rule1 !== undefined) {
-            state.selectedRule1 = props.defaultSelections.rule1;
+        if (props.defaultSelections.whereDropdown == 0) {
+            state.selectedRule1 = props.defaultSelections.resultArray;
+            // console.log("props.defaultSelections.rule1", state.selectedRule1);
         }
         // 对 selectedRule2 做同样的处理
-        if (props.defaultSelections.rule2 !== undefined) {
-            state.selectedRule2 = props.defaultSelections.rule2;
-            console.log("props.defaultSelections.rule2",props.defaultSelections.rule2);
+        if (props.defaultSelections.whereDropdown == 1) {
+            state.selectedRule2 = props.defaultSelections.resultArray;
+            // console.log("props.defaultSelections.rule2",state.selectedRule2);
         }
+    } else {
+        // console.log("props.defaultSelections:", props.defaultSelections);
     }
-    // console.log("props.defaultSelections:", props.defaultSelections);
 });
 
 const deleteSelection = () => {
@@ -84,6 +90,7 @@ const saveRule = () => {
         return;
     }
 
+    let whereDropdown = null;
     let resultArray = [];
 
     // 如果第一个框选中了合法内容，处理第一个框的内容
@@ -93,6 +100,7 @@ const saveRule = () => {
         } else {
             resultArray = state.selectedRule1.split('，').map(item => item.trim());
         }
+        whereDropdown = 0;
     }
 
     // 如果第二个框选中了合法内容，处理第二个框的内容
@@ -102,14 +110,15 @@ const saveRule = () => {
         } else {
             resultArray = state.selectedRule2.split('，').map(item => item.trim());
         }
+        whereDropdown = 1;
     }
     // 确认选中的状态
     // console.log("Before save, selectedRule1:", state.selectedRule1);
     // console.log("Before save, selectedRule2:", state.selectedRule2);
     // console.log('resultArray ', resultArray);
-
+    // console.log("whereDropdown", whereDropdown);
     // 将结果数组传递给父组件
-    emit('save', { position: props.position, entry: { category: props.category, resultArray } });
+    emit('save', { position: props.position, entry: { category: props.category, resultArray, whereDropdown } });
     // 确认传递给父组件的结果
     // console.log("Emitted save event with:", { position: props.position, entry: { category: props.category, resultArray } });
 };

@@ -10,7 +10,7 @@ const excelFile = ref(null);
 const isExcelFile = ref(true);
 
 const goBack = () => {
-  router.back();
+  router.push({ name: 'Home' });
 }
 
 const checkIfExcelFile = (file) => {

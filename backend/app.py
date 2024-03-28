@@ -32,7 +32,7 @@ def save_raw_file():
             file_stream = excel_processor.Excel_IO().convert_excel_format(
                 file_stream, "xls", "xlsx", True
             )
-            print("file_stream:", file_stream)
+            # print("file_stream:", file_stream)
 
         # 给file_rule_maker 的属性赋值
         fuker.get_file_stream(file_stream, file_name)
@@ -58,9 +58,9 @@ def generate_user_rule_dict():
     # print(file, file_name,fields_index_col_dict)
 
     if fields_index_col_dict:
-        print("fields_index_col_dict: ", fields_index_col_dict)
+        # print("fields_index_col_dict: ", fields_index_col_dict)
         field_rules = fuker.generate_user_rule_dict(fields_index_col_dict)
-        print("field rules: ", field_rules)
+        # print("field rules: ", field_rules)
         return jsonify(field_rules)
     return "Error processing file", 500
 
@@ -68,7 +68,7 @@ def generate_user_rule_dict():
 @app.route("/create_final_rules_and_examples", methods=["POST"])
 def create_final_rules_and_examples_file():
     selected_field_rules = json.loads(request.form.get("finalRules"))
-    print("selected_field_rules: ", selected_field_rules)
+    # print("selected_field_rules: ", selected_field_rules)
     final_rules_and_examples, simulate_rule_excel_stream_dict = (
         fuker.create_final_rules_and_examples(selected_field_rules)
     )
@@ -81,8 +81,9 @@ def create_final_rules_and_examples_file():
         byte_stream.seek(0)  # 跳转到流的开头
 
         # 将数据流转换为Base64编码的字符串
-        file_data[mode] = base64.b64encode(byte_stream.getvalue()).decode("utf-8")
-
+        file_data[mode] = [base64.b64encode(byte_stream.getvalue()).decode("utf-8"), final_rules_and_examples[mode]]
+        
+    # print("file_data", file_data)
     return jsonify(file_data), 200
 
 
@@ -91,6 +92,11 @@ def load_and_check_data():
     excelFile = request.files.get("excelFile")
     excel_stream = io.BytesIO(excelFile.read())
     excelFile_name = excelFile.filename
+    
+    if excelFile_name.endswith(".xls"):
+            excelFile_name = excel_processor.Excel_IO().convert_excel_format(
+                excelFile_name, "xls", "xlsx", True
+            )
 
     ruleFile = request.files.get("ruleFile")
 
@@ -103,7 +109,8 @@ def load_and_check_data():
         fileValidator.validate_filled_excel(new_excel)
     )
 
-    print("range_and_rule", range_and_rule)
+    # print("range_and_rule", range_and_rule)
+    
     # print("error_index_col", error_index_col)
     checked_excel_error = {
         "range_and_rule": range_and_rule,

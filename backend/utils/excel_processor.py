@@ -1,40 +1,42 @@
 import openpyxl as px
-import io,json,re,os,warnings,shutil
+import io, json, re, os, warnings, shutil
 from openpyxl.styles import Font, Border, Side, PatternFill, Alignment, Protection
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.utils import range_boundaries
 import win32com.client as win32
-warnings.filterwarnings("ignore", category=UserWarning)
 import pythoncom
+
+warnings.filterwarnings("ignore", category=UserWarning)
+
 
 class Excel_IO:
     def __init__(self):
         # Excel格式映射
-        self.FORMATS = {'xls': 56,    'xlsx': 51}
-        self.temp_path="tmp/"
+        self.FORMATS = {"xls": 56, "xlsx": 51}
+        self.temp_path = "tmp/"
+
     def read_excel_file(self, excel_path, sheet_index=0):
         """openpyxl读取某路径的excel文件,有点害人,返回的是wb和ws的tuple,略微合理。"""
         try:
-            excel_wb = px.load_workbook(excel_path)
-            # 判断是否存在名为"Evaluation Version"的工作表
+            excel_wb = px.load_workbook(excel_path, data_only=True)
+            # 判断是否存在名为"Evaaluation Version"的工作表
             if "Evaluation Version" in excel_wb.sheetnames:
-                sheet_index+=1
+                sheet_index += 1
             excel_ws = excel_wb.worksheets[sheet_index]
-            return (excel_wb,excel_ws)
+            return (excel_wb, excel_ws)
         except IOError as e:
             print(f"An error occurred during reading: {e}")
             # Handle the exception as needed
             return None
 
-    def load_workbook_from_stream(self,excel_stream, sheet_index=0):
+    def load_workbook_from_stream(self, excel_stream, sheet_index=0):
         """openpyxl读取某数据流的excel文件,有点害人,返回的是wb和ws的tuple,略微合理。"""
-        if 1:#try:
+        if 1:  # try:
             # 读取流中的内容为二进制数据
             excel_data = excel_stream.read()
             # 使用BytesIO创建一个类似文件的对象
             excel_bytes = io.BytesIO(excel_data)
             return self.read_excel_file(excel_bytes)
-
 
     def save_excel(self, excel_wb, excel_path):
         """openpyxl传输wb对象到excel文件"""
@@ -43,7 +45,6 @@ class Excel_IO:
         except IOError as e:
             print(f"An error occurred during saving: {e}")
 
-            
     def stream_excel_to_frontend(self, excel_wb):
         """openpyxl传输wb对象到excel数据流"""
         try:
@@ -61,75 +62,64 @@ class Excel_IO:
             print(f"An error occurred during streaming: {e}")
             return None
 
-    def convert_excel_format(self,input_bytes, src_format, dst_format,save_dst=True):
+    def convert_excel_format(self, input_bytes, src_format, dst_format, save_dst=True):
         """根据参数将数据流中的excel格式进行转化，并输出为数据流,默认在temp文件夹中产生的临时文件"""
-        pythoncom.CoInitialize()  # <--- 在此处初始化
-        try:
         # 清理之前的临时文件
-            clear_directory(self.temp_path)
-            
-            # 确保源格式和目标格式是受支持的
-            if src_format not in self.FORMATS or dst_format not in self.FORMATS:
-                raise ValueError('Unsupported format specified.')
+        clear_directory(self.temp_path)
+        # 在调用COM对象之前初始化COM库
+        pythoncom.CoInitialize()
 
-            src_tempfile_path=os.path.abspath(os.path.join(self.temp_path,f"temp.{src_format}"))
-            dst_tempfile_path=os.path.abspath(os.path.join(self.temp_path,f"temp.{dst_format}"))
-            
-            # 创建 Excel 对象
-            excel = win32.gencache.EnsureDispatch('Excel.Application')
-            excel.Visible = False  # 不显示Excel界面
-            
-            # 创建输出流
-            output_io = io.BytesIO()
+        # 确保源格式和目标格式是受支持的
+        if src_format not in self.FORMATS or dst_format not in self.FORMATS:
+            raise ValueError("Unsupported format specified.")
 
-            # 将输入BytesIO对象中的内容写入临时源文件
-            with open(src_tempfile_path, "wb") as temp_file:
-                temp_file.write(input_bytes.getvalue())
+        src_tempfile_path = os.path.abspath(
+            os.path.join(self.temp_path, f"temp.{src_format}")
+        )
+        dst_tempfile_path = os.path.abspath(
+            os.path.join(self.temp_path, f"temp.{dst_format}")
+        )
+
+        # 创建 Excel 对象
+        excel = win32.DispatchEx("Excel.Application")
+        excel.Visible = False  # 不显示Excel界面
+
+        # 创建输出流
+        output_io = io.BytesIO()
+
+        # 将输入BytesIO对象中的内容写入临时源文件
+        with open(src_tempfile_path, "wb") as temp_file:
+            temp_file.write(input_bytes.getvalue())
+
+        try:
             # 打开源文件
-            workbook = excel.Workbooks.Open(os.path.abspath(src_tempfile_path))
+            workbook = excel.Workbooks.Open(src_tempfile_path)
 
             # 另存为目标格式的文件
             workbook.SaveAs(dst_tempfile_path, FileFormat=self.FORMATS[dst_format])
-            workbook.Close(True)
-
-            # 读取目标文件到BytesIO对象
-            with open(dst_tempfile_path, "rb") as temp_file:
-                output_io.write(temp_file.read())
-                
-            # 设置输出流的指针回到起始位置，以便于读取
-            output_io.seek(0)
-            
-            
-            # 清理临时文件
-            os.remove(src_tempfile_path)
-            
-            #在最后的保存excel步骤，可先保留文件至temp文件夹，再传输到用户选择的文件夹
-            if not save_dst:
-                os.remove(dst_tempfile_path)
-
-            # 关闭 Excel 进程
-            excel.Application.Quit()
-            
-            print("output_io:", output_io)
-            
-            return output_io
-            
-            
-        except Exception as e:
-            # 如果有错误发生，可以在这里处理
-            print(f"An error occurred: {e}")
-            
         finally:
-            # 清理COM库
-            pythoncom.CoUninitialize()  # <--- 在此处取消初始化
-            
-        
-        
+            workbook.Close(False)
+            excel.Quit()
+
+        # 读取目标文件到BytesIO对象
+        with open(dst_tempfile_path, "rb") as temp_file:
+            output_io.write(temp_file.read())
+
+        # 清理临时文件
+        os.remove(src_tempfile_path)
+        if not save_dst:
+            os.remove(dst_tempfile_path)
+
+        # 设置输出流的指针回到起始位置，以便于读取
+        output_io.seek(0)
+        pythoncom.CoUninitialize()
+        return output_io
 
 
 class Excel_attribute:
     """目前只考虑了一个工作簿&其一个工作表的修改，进一步：无法实现多个工作表同时修改"""
-    def __init__(self, excel_wb=None , excel_ws=None):
+
+    def __init__(self, excel_wb=None, excel_ws=None):
         """类无传输值分别表示创建新wb、读取wb第一个工作表"""
         if excel_wb is None:
             self.excel_wb = px.Workbook()
@@ -137,128 +127,160 @@ class Excel_attribute:
         else:
             self.excel_wb = excel_wb
             self.excel_ws = excel_ws if excel_ws is not None else excel_wb.worksheets[0]
-    
-    def get_some_axis_cells(self,index,value_only=True):
+
+    def get_some_axis_cells(self, index, value_only=True):
         """获取某一行/列的单元格，依据参数返回单元格对象或值的list"""
-        transform_cell=lambda cell:cell.value if value_only==True else cell
-        excel_field=[transform_cell(cell) for cell in self.excel_ws[index] if cell.value]
+        transform_cell = lambda cell: cell.value if value_only == True else cell
+        excel_field = [
+            transform_cell(cell) for cell in self.excel_ws[index] if cell.value
+        ]
         return excel_field
-    
+
     def get_max_row_col(self):
         """worksheet提供的属性来获取最大行列数问题：目前发现单元格有颜色填充、字色等也会被视为有内容的单元格；
-           根据值遍历出的最大行列数则无此问题
-           此外，纯下拉列表无选择值，二者都不会视为单元格有内容
-           故返回两种方法分别产生的最大行列数集合"""
+        根据值遍历出的最大行列数则无此问题
+        此外，纯下拉列表无选择值，二者都不会视为单元格有内容
+        故返回两种方法分别产生的最大行列数集合"""
         px_max_row = self.excel_ws.max_row
         px_max_col = self.excel_ws.max_column
         value_max_row = 0
         value_max_col = 0
-        last_cell=""
+        last_cell = ""
         for row in self.excel_ws.iter_rows():
             for cell in row:
                 if cell.value:
                     if "".join(str(cell.value).split()):
-                        last_cell=cell
+                        last_cell = cell
                         value_max_row = max(value_max_row, cell.row)
                         value_max_col = max(value_max_col, cell.column)
-        return {"max_col":{px_max_col,value_max_col},
-                "max_row":{px_max_row,value_max_row}}
+        return {
+            "max_col": {px_max_col, value_max_col},
+            "max_row": {px_max_row, value_max_row},
+        }
 
-    def modify_cell_style(self, cell, font=None, border=None, fill=None, 
-                          number_format=None, protection=None, 
-                          hyperlink=None, alignment=None):
+    def modify_cell_style(
+        self,
+        cell,
+        font=None,
+        border=None,
+        fill=None,
+        number_format=None,
+        protection=None,
+        hyperlink=None,
+        alignment=None,
+    ):
         """根据对象性参数修改某一单元格的字体、边框、填充、数字格式、保护方式、超文本、对齐格式等"""
         # Check if cell is a string reference or a Cell object
         if isinstance(cell, str):
             cell = self.excel_ws[cell]
-            
+
         # Apply styles as provided
         # Create a dictionary with attribute names and the values provided
         style_attributes = {
-            'font': font,'border': border,'alignment': alignment,
-            'fill': fill,'number_format': number_format,
-            'protection': protection,'hyperlink': hyperlink }
+            "font": font,
+            "border": border,
+            "alignment": alignment,
+            "fill": fill,
+            "number_format": number_format,
+            "protection": protection,
+            "hyperlink": hyperlink,
+        }
 
         # Apply styles as provided
         for attr_name, attr_value in style_attributes.items():
             if attr_value is not None:
                 setattr(cell, attr_name, attr_value)  # Set attribute by name
-    
+
     def modify_CertainRange_style(self, cell_range, **style_kwargs):
         """根据对象性参数修改某一单元格区域的字体、边框、填充、数字格式、保护方式、超文本、对齐格式等"""
         # Convert cell range to actual range
         min_col, min_row, max_col, max_row = range_boundaries(cell_range)
-        
+
         # Iterate over all cells in the range
         for row in range(min_row, max_row + 1):
             for col in range(min_col, max_col + 1):
                 cell = self.excel_ws.cell(row=row, column=col)
                 self.modify_cell_style(cell, **style_kwargs)
-                
+
     def modify_MutipleRange_style(self, cell_range_list, **style_kwargs):
         """根据对象性参数修改某一多分布单元格区域的字体、边框、填充、数字格式、保护方式、超文本、对齐格式等"""
-        if type(cell_range_list)== str:cell_range_list=[cell_range_list]
+        if type(cell_range_list) == str:
+            cell_range_list = [cell_range_list]
         for cell_range in cell_range_list:
-            self.modify_CertainRange_style(cell_range,**style_kwargs)
+            self.modify_CertainRange_style(cell_range, **style_kwargs)
 
-    
     def get_dropdowns(self):
         """获取工作表内的各列的下拉列表字典，同一行多种下拉列表的以list组织"""
+
         def get_dropdowns_values(validation):
-            result=validation.formula1
-            
+            result = validation.formula1
+
             # 进一步，下拉列表不仅仅为序列
             # 若值为工作表单元格引用
-            
-            #捕获组 (.*!)? 是可选的，用来匹配任意字符后跟一个感叹号 !，代表可能存在的工作表名称。
+
+            # 捕获组 (.*!)? 是可选的，用来匹配任意字符后跟一个感叹号 !，代表可能存在的工作表名称。
             pattern = r"^(.*!)?(\$?[A-Za-z]\$?\d+:\$?[A-Za-z]\$?\d+)$"
-            match_=re.search(pattern,result)
+            match_ = re.search(pattern, result)
             if match_:
-                match_groups=match_.groups()
+                match_groups = match_.groups()
                 # 若跨工作表引用(预计更为合理)
                 if (match_groups)[0]:
-                    sheet_name=match_groups[0][:-1]
-                    sheet_name=sheet_name[1:-1] if sheet_name[0]==sheet_name[-1]=="'" else sheet_name
-                    dropdown_sourcesheet=self.excel_wb[sheet_name]
-                else:dropdown_sourcesheet=self.excel_ws
+                    sheet_name = match_groups[0][:-1]
+                    sheet_name = (
+                        sheet_name[1:-1]
+                        if sheet_name[0] == sheet_name[-1] == "'"
+                        else sheet_name
+                    )
+                    dropdown_sourcesheet = self.excel_wb[sheet_name]
+                else:
+                    dropdown_sourcesheet = self.excel_ws
                 # 默认被引用为数据验证的单元格不止一个
-                min_col, min_row, max_col, max_row = range_boundaries(match_groups[-1].replace('$', ''))
-                value_list=[]
-                for i in range(min_row, max_row+1):
-                    for j in range(min_col, max_col+1):
+                min_col, min_row, max_col, max_row = range_boundaries(
+                    match_groups[-1].replace("$", "")
+                )
+                value_list = []
+                for i in range(min_row, max_row + 1):
+                    for j in range(min_col, max_col + 1):
                         value_list.append(dropdown_sourcesheet.cell(i, j).value)
                 return value_list
-            
+
             # 若值为简单的手动输入序列
             elif "," in result:
                 # 去除首尾的引号后，直接拆分为值
-                return result[1:-1].split(',')
-            
-        drop_row=dict()
+                return result[1:-1].split(",")
+
+        drop_row = dict()
 
         # 含有当前工作表的所有有效性验证的对象
         validations = self.excel_ws.data_validations.dataValidation
-        #print(validations)
+        # print(validations)
         for validation in validations:
-            
-            #当前有效性涉及区域
-            cell=str(validation.sqref)
-            
-            #目前的方式，仅匹配下拉列表选择所以值的。进一步：考虑介于等多种方式
-            result=(get_dropdowns_values(validation))
 
-            #如果是多列的下拉列表相同，分别进行检验
+            # 当前有效性涉及区域
+            cell = str(validation.sqref)
+
+            # 目前的方式，仅匹配下拉列表选择所以值的。进一步：考虑介于等多种方式
+            result = get_dropdowns_values(validation)
+
+            # 如果是多列的下拉列表相同，分别进行检验
             if " " in cell:
-                cells=cell.split(" ")
+                cells = cell.split(" ")
                 for i in cells:
-                    if i[0] not in drop_row:drop_row[i[0]]=[result]
-                    elif set(result) in [set(already_result) for already_result in drop_row[i[0]]]:continue
-                    else:drop_row[i[0]].append(result)
+                    if i[0] not in drop_row:
+                        drop_row[i[0]] = [result]
+                    elif set(result) in [
+                        set(already_result) for already_result in drop_row[i[0]]
+                    ]:
+                        continue
+                    else:
+                        drop_row[i[0]].append(result)
             else:
-                if (cell)[0] not in drop_row:drop_row[(cell)[0]]=[result]
-                else:drop_row[cell[0]].append(result)
+                if (cell)[0] not in drop_row:
+                    drop_row[(cell)[0]] = [result]
+                else:
+                    drop_row[cell[0]].append(result)
         return drop_row
-         
+
     def create_or_update_dv_list(self, field, rule_list):
         """将过长的下拉列表中的选项写入隐藏的工作表中,工作表中各列内容：
             A           B           C
@@ -271,10 +293,10 @@ class Excel_attribute:
         7   下拉列表值6  下拉列表值6  .
         """
         # 检查是否存在名为'sheet_for_DataValidate'的工作表，如果没有则创建
-        sheet_name = 'sheet_for_DataValidate'
+        sheet_name = "sheet_for_DataValidate"
         if sheet_name not in self.excel_wb.sheetnames:
             dv_sheet = self.excel_wb.create_sheet(sheet_name)
-            dv_sheet.sheet_state = 'hidden'  # 隐藏工作表
+            dv_sheet.sheet_state = "hidden"  # 隐藏工作表
         else:
             dv_sheet = self.excel_wb[sheet_name]
 
@@ -293,27 +315,36 @@ class Excel_attribute:
         # 返回引用区域的字符串，例如'Sheet2!$B$2:$B$100'
         return f"'{sheet_name}'!${dv_sheet.cell(row=2, column=col_index).column_letter}$2:${dv_sheet.cell(row=2, column=col_index).column_letter}${len(rule_list)+1}"
 
-
     def set_dropdowns(self, selected_field_rules, sep_row=2):
         """将用户选定的规则字典导出到下拉列表，默认假设字段在第n行，在第n+1行添加规则样例行，n+2开始是下拉列表"""
-        #selected_field_rules = {k: v for k, v in selected_field_rules.items() if v[1]}  # 去掉规则列表没有内容的字段
-        
+        # selected_field_rules = {k: v for k, v in selected_field_rules.items() if v[1]}  # 去掉规则列表没有内容的字段
+
         for one_index_col, (field_name, rule_list) in selected_field_rules.items():
             if rule_list:  # 当规则列表有内容时
                 dv_col, dv_beginrow = one_index_col[0], int(one_index_col[1:]) + sep_row
-                sqref = f'{dv_col}{dv_beginrow}:{dv_col}1048576'  # 确保范围引用格式正确
-                
+                sqref = f"{dv_col}{dv_beginrow}:{dv_col}1048576"  # 确保范围引用格式正确
+
                 # 将规则列表转化为逗号分隔的字符串,并检测是否比255长，若过长即采用引用区域方式呈现。
                 formula1_insides_quotes = ",".join(rule_list)
-                if len(formula1_insides_quotes)>250:
-                    formula1=self.create_or_update_dv_list(one_index_col+":"+field_name,rule_list)
-                else:formula1=f'"{formula1_insides_quotes}"'
+                if len(formula1_insides_quotes) > 250:
+                    formula1 = self.create_or_update_dv_list(
+                        one_index_col + ":" + field_name, rule_list
+                    )
+                else:
+                    formula1 = f'"{formula1_insides_quotes}"'
                 # 添加下拉列表及其对应区域
-                dv = DataValidation(type="list", formula1=formula1, showErrorMessage=True, allow_blank=False)
+                dv = DataValidation(
+                    type="list",
+                    formula1=formula1,
+                    showErrorMessage=True,
+                    allow_blank=False,
+                )
                 self.excel_ws.add_data_validation(dv)
                 dv.add(sqref)
 
-    def set_validation_rules_and_example(self, one_index_col, field_name, rule_list, example):
+    def set_validation_rules_and_example(
+        self, one_index_col, field_name, rule_list, example
+    ):
         """
         设置规则和样例到指定单元格，并且如果规则过长，只使用规则列表的前n项，
         使得len(",".join(rule_list[:n]))<20，并在后面加上"等{len(rule_list)}个选项"。
@@ -370,37 +401,79 @@ class Excel_attribute:
         cell.alignment = Alignment(wrapText=True)"""
 
         cell_value = f"·规则：{rule_display}\n·样例：{example}"
-        cell = self.excel_ws[f"{one_index_col[0]}{int(one_index_col[1])+1}"]#进一步：如何确认规则样例行就在字段的下一行？请调查核实。或者说，字段行下一行如何确保没有内容？
+        cell = self.excel_ws[
+            f"{one_index_col[0]}{int(one_index_col[1])+1}"
+        ]  # 进一步：如何确认规则样例行就在字段的下一行？请调查核实。或者说，字段行下一行如何确保没有内容？
         cell.value = cell_value
-        cell.font = Font(color="FF0000",size=7)  # 红色字体
+        cell.font = Font(color="FF0000", size=7)  # 红色字体
         cell.alignment = Alignment(wrapText=True)  # 开启自动换行"""
 
-if 1:# 一些简单的格式转换和读取           
+
+# for concat：
+class Df_:
+    def __init__(self, file_path_list):
+        """"""
+        self.data_rows = {}  # 各表数据行数
+
+    def compare_field_data(self, field_names, template_names):
+        """比较字段名与模板。输出"""
+
+    def clean_data(self):
+        """清洗的任务，如去除空行、修正数据格式"""
+
+    def merge_excels(self):
+        """合并Excel文件。"""
+
+
+class Style_template:
+    """此类负责存储和应用样式模板。"""
+
+    def __init__(self, workbook):
+        """初始化方法，接收一个openpyxl workbook对象。将工作表作为属性"""
+
+    def get_style_and_location(self):
+        """从模板获取样式，保存为类属性"""
+
+    def apply_to_cell(self, cell):
+        """应用样式到单个单元格。"""
+
+    def apply_to_header(self):
+        """应用样式到表头。"""
+
+    def apply_to_data(self):
+        """应用样式到数据行。"""
+
+
+if 1:  # 一些简单的格式转换和读取
+
     def convert_to_json_stream(data):
         """将Python数据类型转化为JSON格式的字符串，后端不再使用。"""
         json_string = json.dumps(data, indent=4, ensure_ascii=False)
-        
+
         # 创建一个StringIO对象，它提供了文件类的接口
         json_stream = io.StringIO(json_string)
-        
+
         # 返回数据流
         return json_stream
-    def save_py_objection_to_json(py_ob,path):
-        with open(path, 'w', encoding='utf-8') as json_file:
+
+    def save_py_objection_to_json(py_ob, path):
+        with open(path, "w", encoding="utf-8") as json_file:
             json.dump(py_ob, json_file, indent=4, ensure_ascii=False)
+
     def read_from_json_stream(json_stream):
         """从JSON数据流中读取数据并转换为Python数据类型，后端不再使用。"""
         # 重置流的读取位置到起始处
         json_stream.seek(0)
-        
+
         # 从数据流中读取JSON数据并转换为Python数据类型
         data = json.load(json_stream)
-        
+
         # 返回Python数据类型
         return data
+
     def read_from_json_file(file_path):
         """从JSON文件中读取数据并转换为Python数据类型"""
-        with open(file_path, 'r',encoding="utf-8") as json_file:
+        with open(file_path, "r", encoding="utf-8") as json_file:
             data = json.load(json_file)
         return data
 
@@ -418,19 +491,16 @@ if 1:# 一些简单的格式转换和读取
                     else:
                         os.remove(file_path)
                 except Exception as e:
-                    print(f'Failed to delete {file_path}. Reason: {e}')
-
+                    print(f"Failed to delete {file_path}. Reason: {e}")
 
 
 if "__main__" == __name__:
-    Xio=Excel_IO()
-    output=io.BytesIO()
-    excel_got=r"tests\for_xls2xlsx\xls_file.xls"
-    with open(excel_got, 'rb') as file:
+    Xio = Excel_IO()
+    output = io.BytesIO()
+    excel_got = r"tests\for_xls2xlsx\xls_file.xls"
+    with open(excel_got, "rb") as file:
         output.write(file.read())
     # 重置流的位置到开始处，这样就可以从头读取
     output.seek(0)
-    Xio.convert_excel_format(output,"xls","xlsx",True)
+    Xio.convert_excel_format(output, "xls", "xlsx", True)
     input("xls文件已转化为xlsx文件，保存在tests/for_xls2xlsx目录下，请查看")
-
-    

@@ -5,11 +5,13 @@ const store = createStore({
   state() {
     return {
       processedExcelBlob: null,
-      finalExcelBlob: {},
+      excelAndRuleData: {},
       checkedExcelBlob: null,
       rulesData: {},
       errorPosition: [],
-      positionRule: {}
+      positionRule: {},
+      preSelectedDropDowns: {},
+      preSelectedField: {},
 
     };
   },
@@ -21,14 +23,17 @@ const store = createStore({
     setProcessedExcelBlob(state, data) {
       state.processedExcelBlob = data;
     },
-    setFinalExcelBlob(state, data) {
-      state.finalExcelBlob = data;
+    setExcelAndRuleData(state, data) {
+      state.excelAndRuleData = data;
     },
     setCheckedExcelBlob(state, data) {
       state.checkedExcelBlob = data;
     },
     setPreSelectedDropDowns(state, data) {
       state.preSelectedDropDowns = data;
+    },
+    setPreSelectedField(state, data) {
+      state.preSelectedField = data;
     },
     DELETE_RULE(state, position) {
       delete state.rulesData[position]
@@ -38,7 +43,7 @@ const store = createStore({
     },
     setPositionRule(state, data){
       state.positionRule = data
-    }
+    },
 
   },
   actions: {
@@ -49,14 +54,17 @@ const store = createStore({
     fetchProcessedExcelData({ commit }, payload) {
       commit('setProcessedExcelBlob', payload);
     },
-    fetchFinalExcelData({ commit }, payload) {
-      commit('setFinalExcelBlob', payload);
+    fetchExcelAndRuleData({ commit }, payload) {
+      commit('setExcelAndRuleData', payload);
     },
     fetchCheckedExcelData({ commit }, payload) {
       commit('setCheckedExcelBlob', payload);
     },
     savePreSelectedDropDowns({ commit }, payload) {
       commit('setPreSelectedDropDowns', payload);
+    },
+    savePreSelectedField({ commit }, payload) {
+      commit('setPreSelectedField', payload);
     },
     deleteRule({ commit }, position) {
       commit('DELETE_RULE', position)
@@ -71,3 +79,5 @@ const store = createStore({
 });
 
 export default store;
+
+
