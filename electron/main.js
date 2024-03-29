@@ -11,15 +11,31 @@ let flaskProcess = null; // 用于跟踪 Flask 进程
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
+        titile: "Excelerate APP",
         width: 800,
         height: 600,
         webPreferences: {
             nodeIntegration: true
-        }
+        },
+        show: false // 先不显示窗口, 等待最大化后再显示
     });
+
+    // 取消菜单栏
+    mainWindow.setMenu(null);
 
     // 加载前端构建后的index.html
     mainWindow.loadFile(path.join(__dirname, 'public/index.html'))
+
+    // 'ready-to-show' 事件在页面渲染完成后发出
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.maximize(); // 最大化窗口
+        mainWindow.show(); // 然后显示窗口
+    });
+
+    // 当窗口关闭时触发的事件
+    mainWindow.on('closed', function () {
+        mainWindow = null;
+    });
 
     // 启动flask服务器的可执行文件
     const flaskApp = path.join(__dirname, 'resources/app')
@@ -48,7 +64,7 @@ const createWindow = () => {
     //     console.log(`Flask process exited with code ${code}`);
     // });
 
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 }
 
 

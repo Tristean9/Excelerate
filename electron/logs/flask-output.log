@@ -1,0 +1,55 @@
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 106-112-261
+127.0.0.1 - - [29/Mar/2024 11:49:13] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [29/Mar/2024 11:49:16] "POST /generate_user_rule_dict HTTP/1.1" 200 -
+127.0.0.1 - - [29/Mar/2024 11:49:44] "POST /create_final_rules_and_examples HTTP/1.1" 200 -
+127.0.0.1 - - [29/Mar/2024 11:50:00] "POST /load_and_check_data HTTP/1.1" 200 -
+127.0.0.1 - - [29/Mar/2024 11:50:13] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [29/Mar/2024 11:50:15] "POST /generate_user_rule_dict HTTP/1.1" 200 -
+127.0.0.1 - - [29/Mar/2024 11:50:19] "POST /create_final_rules_and_examples HTTP/1.1" 200 -
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 506-915-574
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 265-474-240
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 495-994-766
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 928-872-057
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 790-230-665

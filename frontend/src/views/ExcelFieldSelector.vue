@@ -1,4 +1,6 @@
 <script setup>
+import ErrorModal from "@/components/ErrorModal.vue";
+
 import { ref, watch, computed } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
 
@@ -14,18 +16,19 @@ import * as GC from '@grapecity/spread-sheets'
 
 const spread = ref(null);
 const spreadStyles = { width: "1200px", height: "600px" };
-
+const isErrorModalVisible = ref(false);
+const errorModalText = ref('');
 
 const preSelectedField2 = computed(() => {
   let fields = [];
-  if (store.state.preSelectedField){
-    for (const [position, entry] of Object.entries(store.state.preSelectedField)){
-      fields.push({"position":position, "fieldName":entry[0]});
+  if (store.state.preSelectedField) {
+    for (const [position, entry] of Object.entries(store.state.preSelectedField)) {
+      fields.push({ "position": position, "fieldName": entry[0] });
     }
   }
   // console.log("fields", fields);
   return fields
-  });
+});
 // console.log("preSelectedField", preSelectedField.value);
 const selectedFields = ref(preSelectedField2.value);
 // console.log("selectedFields", selectedFields.value);
@@ -105,21 +108,27 @@ const bindCellClickForActiveSheet = () => {
 
     selections.forEach((range) => {
       for (let r = range.row; r < range.row + range.rowCount; r++) {
-        if (isInvalidSelection){
+        if (isInvalidSelection) {
           break
         }
         for (let c = range.col; c < range.col + range.colCount; c++) {
           // 检查单元格是否是合并单元格的一部分
           const span = sheet.getSpan(r, c);
           if (span && (span.row === r && span.col === c)) {
-            alert('不可以选中合并的单元格');
+            // alert('不可以选中合并的单元格');
+            errorModalText.value = '不可以选中合并的单元格';
+            isErrorModalVisible.value = true;
             isInvalidSelection = true;
             break;
           }
           // 检查单元格是否为空
           const cellValue = sheet.getValue(r, c);
           if (cellValue === null || cellValue === '') {
-            alert('不可以选中空单元格');
+            // alert('不可以选中空单元格');
+            errorModalText.value = '不可以选中空单元格';
+            isErrorModalVisible.value = true;
+            console.log("isErrorModalVisible",isErrorModalVisible,);
+
             isInvalidSelection = true;
             break;
           }
@@ -133,10 +142,12 @@ const bindCellClickForActiveSheet = () => {
           const isPositionExist = selectedFields.value.some(item => item.position === position);
 
           if (!isPositionExist) {
-            selectedFields.value.push({ 'position':position, "fieldName":fieldName });
+            selectedFields.value.push({ 'position': position, "fieldName": fieldName });
           } else {
             // 如果不希望在选择时弹出警告，可以注释掉下面的alert
-            alert(`位置 ${position} 已经被选中`);
+            // alert(`位置 ${position} 已经被选中`);
+            errorModalText.value = `位置 ${position} 已经被选中`
+            isErrorModalVisible.value = true;
             break
           }
 
@@ -184,8 +195,8 @@ onBeforeRouteLeave((to, from, next) => {
   if (to.name === 'ExcelFileUploader') {
 
     // 调用重置数据的方法
-    store.dispatch('savePreSelectedField', computed(() => {}));
-    store.dispatch('savePreSelectedDropDowns',{});
+    store.dispatch('savePreSelectedField', computed(() => { }));
+    store.dispatch('savePreSelectedDropDowns', {});
   }
   // 继续路由跳转
   next();
@@ -193,7 +204,7 @@ onBeforeRouteLeave((to, from, next) => {
 
 
 const goBack = () => {
-  router.push({ name: 'ExcelFileUploader'});
+  router.push({ name: 'ExcelFileUploader' });
 }
 
 const goHome = () => {
@@ -203,9 +214,9 @@ const goHome = () => {
 
 <template>
   <div class="nav-button">
-        <button @click="goBack">返回</button>
-        <button @click="goHome">主页</button>
-    </div>
+    <button @click="goBack">返回</button>
+    <button @click="goHome">主页</button>
+  </div>
   <div class="title-container">
     <div class="title-text">字段选择</div>
   </div>
@@ -245,18 +256,19 @@ const goHome = () => {
             </tbody>
           </table>
         </div>
-        <button v-if="Object.keys(selectedFields).length > 0 " @click="sendFiledNames">发送规则字段</button>
+        <button v-if="Object.keys(selectedFields).length > 0" @click="sendFiledNames">发送规则字段</button>
       </div>
 
     </div>
   </div>
+  <error-modal  :text="errorModalText" :is-visible="isErrorModalVisible"  @update:isVisible="isErrorModalVisible = $event"/>
+
 </template>
 
 <style scoped>
 #excel-area {
   margin-bottom: 20px;
 }
-
 
 
 #tip-container {

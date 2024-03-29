@@ -253,7 +253,7 @@ const handleDropdownClick = (event, ruleIndex) => {
                 placeholder="选择或输入规则" :editable="true" @update:modelValue="(value) => updateSelectedRule(value, 1)"
                 @click="event => handleDropdownClick(event, 1)" />
         </div>
-        <div id="button-container">
+        <div class="button-container">
             <button @click="saveRule">保存</button>
             <button @click="deleteSelection">删除</button>
         </div>
@@ -262,8 +262,10 @@ const handleDropdownClick = (event, ruleIndex) => {
             style="width: 50vw;">
             <Textarea v-model="state.editableContentRule1" style="width: 100%; height: 20vw;" rows="5" cols="30"
                 autoResize />
-            <Button label="保存" @click="() => saveEdit(0)" />
-            <Button label="取消" class="p-button-text" @click="() => cancelEdit(0)" />
+            <div class="button-container">
+                <Button label="保存" @click="() => saveEdit(0)" />
+                <Button label="取消" class="p-button-text" @click="() => cancelEdit(0)" />
+            </div>
         </Dialog>
 
         <!-- 程序预定义规则的编辑模态框 -->
@@ -271,8 +273,10 @@ const handleDropdownClick = (event, ruleIndex) => {
             style="width: 50vw;">
             <Textarea v-model="state.editableContentRule2" style="width: 100%; height: 20vw;" rows="5" cols="30"
                 autoResize />
-            <Button label="保存" @click="() => saveEdit(1)" />
-            <Button label="取消" class="p-button-text" @click="() => cancelEdit(1)" />
+            <div class="button-container">
+                <Button label="保存" @click="() => saveEdit(1)" />
+                <Button label="取消" class="p-button-text" @click="() => cancelEdit(1)" />
+            </div>
         </Dialog>
     </div>
 </template>

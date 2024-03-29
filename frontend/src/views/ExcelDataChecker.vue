@@ -210,7 +210,7 @@ const goHome = () => {
         </div>
         <div id="tip-button-container">
             <div id="button-check">
-                <h2>请点击检查按钮进行数据检验</h2>
+                <div class="tip-texts">请点击检查按钮进行数据检验</div>
                 <button @click="checkExcelData">检查</button>
             </div>
             <div id="error-position">
@@ -258,6 +258,13 @@ const goHome = () => {
     gap: 80px; /* 设置子元素之间的间隔 */
 }
 
+#button-check {
+    display: flex;
+    flex-direction: column;
+}
+#button-check .tip-texts{
+    text-align: center;
+}
 .modal {
     position: fixed;
     top: 0;
