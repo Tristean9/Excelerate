@@ -50,25 +50,30 @@ const uploadAndLoadExcelFile = async () => {
   }
 };
 
-
+const goHome = () => {
+    router.push({ name: 'Home' });
+}
 </script>
 
 <template>
   <div>
+    <div class="nav-button">
+        <button @click="goBack">返回</button>
+        <button @click="goHome">主页</button>
+    </div>
     <div class="title-container">
-      <div class="title-text">文件上传页面</div>
+      <div class="title-text">文件上传</div>
     </div>
     
     <div class="uploader-container">
       <div class="uploader">
         <input id="fileLoader" type="file" accept=".xlsx,.xls" @change="handledFileSelection" />
-        <button :disabled="!isExcelFile" @click="uploadAndLoadExcelFile">Open</button>
+        <button :disabled="!isExcelFile" @click="uploadAndLoadExcelFile">打开</button>
       </div>
       <p v-if="!isExcelFile" class="error-message">请上传一个有效的Excel文件(.xls 或 .xlsx)</p>
     </div>
     
   </div>
-  <button @click="goBack">return</button>
 </template>
 
 <style>

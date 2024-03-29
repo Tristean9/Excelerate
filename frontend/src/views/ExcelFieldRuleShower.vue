@@ -22,8 +22,8 @@ const currentExcelAndRule = ref(excelAndRuleData.value[currentMode.value])
 
 const modeText = {
   "0-0": "不对文件内容做修改",
-  "1-1": "在文件的字段下一行添加规则&样例行",
-  "1-2": "在文件除了表头的位置，均根据规则添加下拉列表",
+  "1-1": "在表头下一行添加规则&样例行",
+  "1-2": "除表头外，均根据规则添加下拉列表",
   "2-2": "同时添加规则&样例行和下拉列表",
 }
 
@@ -32,7 +32,7 @@ const initSpread = (s) => {
   // console.log(currentMode.value)
   // console.log(currentExcelBlob.value)
   if (currentExcelAndRule.value) {
-    console.log("currentExcelAndRule.value[0]",currentExcelAndRule.value[0]);
+    console.log("currentExcelAndRule.value[0]", currentExcelAndRule.value[0]);
     loadAndDisplayExcelContent(currentExcelAndRule.value[0])
   }
   spread.value.bind(GC.Spread.Sheets.Events.CellClick, handleCellClick);
@@ -96,10 +96,10 @@ const saveCurrentExcelAndJsonFile = () => {
 
 const saveRuleFile = () => {
   const jsonString = JSON.stringify(currentExcelAndRule.value[1], null, 2);
-    // 创建一个Blob对象，指定内容类型为JSON
-    const blob = new Blob([jsonString], { type: "application/json" });
-      // 使用saveAs函数保存文件，文件名为example.json
-    saveAs(blob, "rule.json");
+  // 创建一个Blob对象，指定内容类型为JSON
+  const blob = new Blob([jsonString], { type: "application/json" });
+  // 使用saveAs函数保存文件，文件名为example.json
+  saveAs(blob, "rule.json");
 }
 
 const saveExcelFile = () => {
@@ -115,11 +115,19 @@ const goBack = () => {
   router.push({ name: 'ExcelFieldRuleMaker' });
 }
 
+const goHome = () => {
+  router.push({ name: 'Home' });
+}
 </script>
 
 <template>
+  <div class="nav-button">
+        <button @click="goBack">返回</button>
+        <button @click="goHome">主页</button>
+    </div>
   <div class="title-container">
-    <div class="title-text">规则样例展示页面</div>
+
+    <div class="title-text">样例展示</div>
   </div>
 
   <div class="excel-container">
@@ -133,21 +141,20 @@ const goBack = () => {
       <gc-spread-sheets :hostStyle="spreadStyles" @workbookInitialized="initSpread">
         <gc-worksheet></gc-worksheet>
       </gc-spread-sheets>
-      
+
 
     </div>
     <div id="tip-mode">
-        <div class="tip-text-container">
-          <h2>请选择你需要展示的表格的模式</h2>
-        </div>
-        <button v-for="mode in Object.keys(store.state.excelAndRuleData)" :key="mode" @click="switchMode(mode)"> {{
-          modeText[mode]
-        }}</button>
-        <button @click="saveCurrentExcelAndJsonFile">save</button>
-      </div>
+        <div class="tip-texts">请选择您需要展示的表格的模式</div>
+      <button class="mode-button" v-for="mode in Object.keys(store.state.excelAndRuleData)" :key="mode"
+        @click="switchMode(mode)"> {{
+    modeText[mode]
+  }}</button>
+      <button @click="saveCurrentExcelAndJsonFile">保存</button>
+    </div>
   </div>
 
-  <button @click="goBack">return</button>
+
 
 </template>
 
@@ -160,10 +167,26 @@ const goBack = () => {
   display: flex;
   flex-direction: column;
   gap: 50px;
+  margin-left: 20px;
 }
 
-.tip-text-container {
-  justify-content: center;
-  align-items: center;
+#tip-mode .tip-texts {
+  text-align: center; /* 确保文本在容器内部居中，对于多行文本特别有用 */
 }
+
+.mode-button {
+  background-image: linear-gradient(to right, #4fc3f7, #0288d1);
+  border: none;  /* 移除边框 */
+  color: white;  /* 文字颜色为白色，确保可读性 */
+  padding: 10px 15px;  /* 按钮内边距 */
+  border-radius: 5px;  /* 轻微的圆角 */
+  cursor: pointer;  /* 鼠标悬停时显示指针 */
+  outline: none;  /* 点击时不显示轮廓 */
+  transition: background-color 0.3s ease;  /* 平滑背景颜色过渡效果 */
+}
+
+.mode-button:hover {
+  background-image: linear-gradient(to right, #029be5, #0277bd);  /* 鼠标悬停时的背景变化 */
+}
+
 </style>

@@ -180,19 +180,25 @@ const cancelSave = () => {
 const goBack = () => {
     router.push({ name: 'ExcelRuleUploader' });
 }
-
+const goHome = () => {
+    router.push({ name: 'Home' });
+}
 </script>
 
 
 <template>
+    <div class="nav-button">
+        <button @click="goBack">返回</button>
+        <button @click="goHome">主页</button>
+    </div>
+
     <div class="title-container">
-        <div class="title-text">数据检验页面</div>
+        <div class="title-text">数据检验</div>
     </div>
     <div class="excel-container">
         <div class="excel-area">
             <div id="excel-tools">
-                <!--<button @click="toggleFontColor" > 切换字体颜色</button>
-            <button @click="toggleHighlightCells">切换背景高亮</button>-->
+
                 <div class="detail-box" v-if="selectedCellText">
                     <!-- 这里显示选中单元格的文本内容 -->
                     <div class="cell-details">{{ selectedCellText }}</div>
@@ -202,18 +208,21 @@ const goBack = () => {
                 <gc-worksheet></gc-worksheet>
             </gc-spread-sheets>
         </div>
-        <div id="tip-button">
-            <h2>请点击检查按钮进行数据检验</h2>
-            <button @click="checkExcelData">检查</button>
+        <div id="tip-button-container">
+            <div id="button-check">
+                <h2>请点击检查按钮进行数据检验</h2>
+                <button @click="checkExcelData">检查</button>
+            </div>
+            <div id="error-position">
+                <template v-if="currentErrorPosition.length > 0">
+                    <h2>以下是可能存在问题的数据的位置及原因</h2>
+                    <h3>{{ currentErrorAndReason }}</h3>
+                </template>
+                <template v-else>
+                    <h2>您的数据经检验已无问题</h2>
+                </template>
+            </div>
 
-            <template v-if="currentErrorPosition.length > 0">
-                <h2>以下是可能存在问题的数据的位置及原因</h2>
-                <h3>{{ currentErrorAndReason }}</h3>
-            </template>
-            <template v-else>
-                <h2>您的数据经检验已无问题</h2>
-                <!-- <h3>{{ currentErrorPosition }}</h3> -->
-            </template>
             <button @click="saveExcel">保存</button>
         </div>
 
@@ -230,25 +239,23 @@ const goBack = () => {
             <p>您的数据经检查已无问题，正在为您保存</p>
         </div>
     </div>
-    <button @click="goBack">return</button>
 
 </template>
 
 
 <style scoped>
-.gc-spread-sheets {
-    /* margin-right: 200px;  */
-}
+
 
 .table {
     width: 100%;
 }
 
-#tip-button {
+#tip-button-container {
     display: flex;
     flex-direction: column;
-    margin-left: 20px;
-    width: 200px
+    /* margin-left: 20px; */
+    /* width: 200px; */
+    gap: 80px; /* 设置子元素之间的间隔 */
 }
 
 .modal {
@@ -270,5 +277,4 @@ const goBack = () => {
     border-radius: 5px;
     text-align: center;
 }
-
 </style>

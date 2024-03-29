@@ -171,10 +171,6 @@ const sendFiledNames = async () => {
   }
 };
 
-const goBack = () => {
-  router.push({ name: 'ExcelFileUploader'});
-}
-
 // 检测state变化
 watch(processedExcelBlob, (newVal, oldVal) => {
   if (newVal) {
@@ -196,11 +192,22 @@ onBeforeRouteLeave((to, from, next) => {
 });
 
 
+const goBack = () => {
+  router.push({ name: 'ExcelFileUploader'});
+}
+
+const goHome = () => {
+  router.push({ name: 'Home' });
+}
 </script>
 
 <template>
+  <div class="nav-button">
+        <button @click="goBack">返回</button>
+        <button @click="goHome">主页</button>
+    </div>
   <div class="title-container">
-    <div class="title-text">规则字段选择页面</div>
+    <div class="title-text">字段选择</div>
   </div>
   <div>
     <div class="excel-container">
@@ -219,7 +226,7 @@ onBeforeRouteLeave((to, from, next) => {
         </gc-spread-sheets>
       </div>
       <div id="tip-container">
-        <div class="tip-texts">请点击左侧表格中的单元格，确认字段信息。（一个小？符号，点击/鼠标悬浮后会弹出小框:若字段来自不同主体，字段名可重复）</div>
+        <div class="tip-texts">请在左侧表格中点击需为其设立规则的表头（字段），选中的字段会显示在右侧</div>
         <div id="column">
           <table>
             <thead>
@@ -238,12 +245,11 @@ onBeforeRouteLeave((to, from, next) => {
             </tbody>
           </table>
         </div>
-        <button @click="sendFiledNames">发送规则字段</button>
+        <button v-if="Object.keys(selectedFields).length > 0 " @click="sendFiledNames">发送规则字段</button>
       </div>
 
     </div>
   </div>
-  <button @click="goBack">return</button>
 </template>
 
 <style scoped>
@@ -254,43 +260,13 @@ onBeforeRouteLeave((to, from, next) => {
 
 
 #tip-container {
-  margin: 0 20px
+
+  display: flex;
+  flex-direction: column;
 
 }
 
-input[type="file"] {
-  border: 1px solid #ccc;
-  display: inline-block;
-  padding: 6px 12px;
-  cursor: pointer;
-  border-radius: 4px;
-  margin-right: 10px;
-}
 
-button {
-  padding: 10px 15px;
-  font-size: 16px;
-  color: white;
-  background-image: linear-gradient(to right, #667eea, #764ba2);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  outline: none;
-  margin-right: 10px;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
-}
-
-button:hover {
-  background-image: linear-gradient(to right, #667eea, #764ba2);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2);
-}
-
-button:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
-}
 
 table {
   width: 100%;
@@ -312,13 +288,8 @@ tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-/* 提示文本样式 */
-.tip-texts {
-  background-color: #e7e7e7;
-  padding: 10px;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 20px;
+
+#tip-container button {
+  margin-top: auto;
 }
 </style>

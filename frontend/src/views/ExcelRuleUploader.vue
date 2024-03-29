@@ -62,7 +62,7 @@ const uploadAndLoadExcelFile = async () => {
             const base64String = response.data.checked_excel
             const errorPosition = response.data.error_index_col
             const positionRule = response.data.range_and_rule
-            
+
             // 将Base64编码文件转换成Blob对象
             const fileBlobData = base64ToBlob(base64String, 'application/vnd.ms-excel');
 
@@ -86,17 +86,24 @@ const uploadAndLoadExcelFile = async () => {
 const goBack = () => {
     router.push({ name: 'Home' });
 }
+const goHome = () => {
+    router.push({ name: 'Home' });
+}
 </script>
 
 
 <template>
     <div>
+        <div class="nav-button">
+            <button @click="goBack">返回</button>
+            <button @click="goHome">主页</button>
+        </div>
         <div class="title-container">
-            <div class="title-text">文件上传页面</div>
+            <div class="title-text">文件上传</div>
         </div>
 
         <div class="uploader-container">
-            <div>请分别在左右两个文件上传框里上传Excel文件和规则json文件</div>
+            <div>请分别在左右两个文件上传框里上传Excel文件和对应的规则json文件</div>
             <div class="uploader">
                 <input class="fileLoader" type="file" accept=".xlsx,.xls" @change="handledExcelFileSelection" />
                 <input class="fileLoader" type="file" accept=".json" @change="handledRuleFileSelection" />
@@ -106,7 +113,6 @@ const goBack = () => {
             <p v-if="!isJsonFile" class="error-message">请上传一个有效的Json文件(.json)</p>
         </div>
     </div>
-    <button @click="goBack">return</button>
 
 </template>
 
