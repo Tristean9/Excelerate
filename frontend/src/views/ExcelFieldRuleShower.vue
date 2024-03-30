@@ -12,8 +12,9 @@ import { saveAs } from 'file-saver';
 
 const currentMode = ref('2-2');
 const spread = ref(null);
-const spreadStyles = { width: '1200px', height: '600px' };
-
+const spreadStyles = computed(() => {
+  return { width: '100%', height: '600px' };
+});
 const excelAndRuleData = computed(() => store.state.excelAndRuleData)
 
 // 存储当前的excelBlob;
@@ -122,9 +123,9 @@ const goHome = () => {
 
 <template>
   <div class="nav-button">
-        <button @click="goBack">返回</button>
-        <button @click="goHome">主页</button>
-    </div>
+    <button @click="goBack">返回</button>
+    <button @click="goHome">主页</button>
+  </div>
   <div class="title-container">
 
     <div class="title-text">样例展示</div>
@@ -145,11 +146,11 @@ const goHome = () => {
 
     </div>
     <div id="tip-mode">
-        <div class="tip-texts">请选择您需要展示的表格的模式</div>
+      <div class="tip-texts">请选择您需要展示的表格的模式</div>
       <button class="mode-button" v-for="mode in Object.keys(store.state.excelAndRuleData)" :key="mode"
         @click="switchMode(mode)"> {{
-    modeText[mode]
-  }}</button>
+      modeText[mode]
+    }}</button>
       <button @click="saveCurrentExcelAndJsonFile">保存</button>
     </div>
   </div>
@@ -171,22 +172,30 @@ const goHome = () => {
 }
 
 #tip-mode .tip-texts {
-  text-align: center; /* 确保文本在容器内部居中，对于多行文本特别有用 */
+  text-align: center;
+  /* 确保文本在容器内部居中，对于多行文本特别有用 */
 }
 
 .mode-button {
   background-image: linear-gradient(to right, #4fc3f7, #0288d1);
-  border: none;  /* 移除边框 */
-  color: white;  /* 文字颜色为白色，确保可读性 */
-  padding: 10px 15px;  /* 按钮内边距 */
-  border-radius: 5px;  /* 轻微的圆角 */
-  cursor: pointer;  /* 鼠标悬停时显示指针 */
-  outline: none;  /* 点击时不显示轮廓 */
-  transition: background-color 0.3s ease;  /* 平滑背景颜色过渡效果 */
+  border: none;
+  /* 移除边框 */
+  color: white;
+  /* 文字颜色为白色，确保可读性 */
+  padding: 10px 15px;
+  /* 按钮内边距 */
+  border-radius: 5px;
+  /* 轻微的圆角 */
+  cursor: pointer;
+  /* 鼠标悬停时显示指针 */
+  outline: none;
+  /* 点击时不显示轮廓 */
+  transition: background-color 0.3s ease;
+  /* 平滑背景颜色过渡效果 */
 }
 
 .mode-button:hover {
-  background-image: linear-gradient(to right, #029be5, #0277bd);  /* 鼠标悬停时的背景变化 */
+  background-image: linear-gradient(to right, #029be5, #0277bd);
+  /* 鼠标悬停时的背景变化 */
 }
-
 </style>

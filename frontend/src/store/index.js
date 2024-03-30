@@ -5,13 +5,16 @@ const store = createStore({
   state() {
     return {
       processedExcelBlob: null,
-      excelAndRuleData: {},
+      excelAndRuleData: {}, 
       checkedExcelBlob: null,
-      rulesData: {},
-      errorPosition: [],
-      positionRule: {},
-      preSelectedDropDowns: {},
-      preSelectedField: {},
+      rulesData: {},  // 返回的规则数据
+      errorPosition: [], //数据错误位置
+      positionRule: {}, // 数据错误的规则
+      preSelectedDropDowns: {}, // 预选过的选项
+      preSelectedField: {}, // 预选过的字段
+
+      contactedData: null,  // 合并后的总表
+      exampleExcelBlob:null, // 合并钱前选择的样表
 
     };
   },
@@ -44,6 +47,9 @@ const store = createStore({
     setPositionRule(state, data){
       state.positionRule = data
     },
+    setExampleExcelBlob(state, data){
+      state.exampleExcelBlob = data
+    }
 
   },
   actions: {
@@ -74,7 +80,11 @@ const store = createStore({
     },
     fetchPositionRule({ commit }, payload){
       commit('setPositionRule', payload)
+    },
+    saveExampleExcelBlob({ commit }, data){
+      commit('setExampleExcelBlob', data)
     }
+
   }
 });
 

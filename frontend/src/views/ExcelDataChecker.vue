@@ -13,8 +13,9 @@ import '@grapecity/spread-sheets-io';
 import * as GC from '@grapecity/spread-sheets'
 
 const spread = ref(null);
-const spreadStyles = { width: "1200px", height: "600px" };
-
+const spreadStyles = computed(() => {
+    return { width: '100%', height: '600px' };
+});
 
 const checkedExcelBlob = computed(() => store.state.checkedExcelBlob); // 从上个上传页面计算得来
 const currentExcelBlob = ref(checkedExcelBlob.value); // 储存当前的Excel的Blob
@@ -197,7 +198,7 @@ const goHome = () => {
     </div>
     <div class="excel-container">
         <div class="excel-area">
-            <div id="excel-tools">
+            <div class="excel-tools">
 
                 <div class="detail-box" v-if="selectedCellText">
                     <!-- 这里显示选中单元格的文本内容 -->
@@ -208,7 +209,7 @@ const goHome = () => {
                 <gc-worksheet></gc-worksheet>
             </gc-spread-sheets>
         </div>
-        <div id="tip-button-container">
+        <div class="tip-container">
             <div id="button-check">
                 <div class="tip-texts">请点击检查按钮进行数据检验</div>
                 <button @click="checkExcelData">检查</button>
@@ -230,8 +231,10 @@ const goHome = () => {
     <div v-if="isModalVisible1" class="modal">
         <div class="modal-content">
             <p>您的数据可能依然存在问题，是否继续保存？</p>
-            <button @click="confirmSave">是</button>
-            <button @click="cancelSave">否</button>
+            <div class="button-container">
+                <button @click="confirmSave">是</button>
+                <button @click="cancelSave">否</button>
+            </div>
         </div>
     </div>
     <div v-if="isModalVisible2" class="modal">
@@ -244,27 +247,26 @@ const goHome = () => {
 
 
 <style scoped>
-
+.tip-container {
+    gap: 80px;
+    /* 设置子元素之间的间隔 */
+}
 
 .table {
     width: 100%;
 }
-
-#tip-button-container {
-    display: flex;
-    flex-direction: column;
-    /* margin-left: 20px; */
-    /* width: 200px; */
-    gap: 80px; /* 设置子元素之间的间隔 */
+.button-container {
+    justify-content: space-between; /* 可以改为 space-around 或 space-evenly */
 }
-
 #button-check {
     display: flex;
     flex-direction: column;
 }
-#button-check .tip-texts{
+
+#button-check .tip-texts {
     text-align: center;
 }
+
 .modal {
     position: fixed;
     top: 0;

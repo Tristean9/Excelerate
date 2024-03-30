@@ -8,27 +8,60 @@ import router from "@/router/index.js";
 const store = useStore();
 const excelFiles = ref([]);
 const exampleFile = ref(null);
+const allIsExcelFile = ref(true);
 const isExcelFile = ref(true);
-const isJsonFile = ref(true);
 
 const handledExcelFileSelection = (event) => {
-    excelFile.value = Array.from(event.target.files);
-    console.log("excelFile:", excelFiles.value);
-    // isExcelFile.value = checkIfExcelFile(excelFile.value);
+    const files = Array.from(event.target.files);
+    allIsExcelFile.value = files.every(file => checkIfExcelFile(file));
+    excelFiles.value = allIsExcelFile.value ? files : [];
+    console.log("excelFiles:", excelFiles.value);
 };
 
 const handledExampleFileSelection = (event) => {
-    exampleFile.value = event.target.files[0];
-    // console.log("ruleFile:", ruleFile.value);
-    // isJsonFile.value = checkIfJsonFile(ruleFile.value);
+    const file = event.target.files[0];
+    isExcelFile.value = checkIfExcelFile(file);
+    exampleFile.value = isExcelFile.value ? file : null;
+    console.log("exampleFile:", exampleFile.value);
 };
+
+const checkIfExcelFile = (file) => {
+    const fileExtension = file.name.split('.').pop();
+    return ['xls', 'xlsx'].includes(fileExtension);
+}
+
 
 const goBack = () => {
     router.push({ name: 'Home' });
 }
+const goHome = () => {
+    router.push({ name: 'Home' });
+}
 
 // 发送需要合并的Excel文件数组
-const uploadExcelFile = () => {
+const uploadExcelFiles = async () => {
+    if (!isExcelFile.value || !allIsExcelFile.value) {
+        // 可以添加一个用户提示，表明文件格式不正确
+        console.error("文件格式不正确，请上传有效的Excel文件。");
+        return;
+    }
+    // 构建一个FormData对象来发送文件
+    const formData = new FormData();
+    excelFiles.value.forEach(file => {
+        formData.append('excelFiles', file);
+    });
+    formData.append('exampleFile', exampleFile.value);
+
+    const response = await http.post('/load-excelFiles-example', formData,
+        { responseType: "blob" }
+    );
+    console.log("response.data", response.data);
+
+    const exampleExcelBlob = response.data;
+
+    await store.dispatch('saveExampleExcelBlob', exampleExcelBlob)
+    await router.push({ name: 'ExampleDataSelector' });
+
 
 }
 </script>
@@ -37,8 +70,12 @@ const uploadExcelFile = () => {
 
 <template>
     <div>
+        <div class="nav-button">
+            <button @click="goBack">返回</button>
+            <button @click="goHome">主页</button>
+        </div>
         <div class="title-container">
-            <div class="title-text">文件上传页面</div>
+            <div class="title-text">文件上传</div>
         </div>
 
         <div class="uploader-container">
@@ -47,13 +84,12 @@ const uploadExcelFile = () => {
                 <input class="fileLoader" type="file" accept=".xlsx,.xls" @change="handledExcelFileSelection"
                     multiple />
                 <input class="fileLoader" type="file" accept=".xlsx, .xls" @change="handledExampleFileSelection" />
-                <button @click="uploadAndLoadExcelFile">Open</button>
+                <button @click="uploadExcelFiles">上传</button>
             </div>
-            <p v-if="!isExcelFile" class="error-message">请上传若干个有效的Excel文件(.xls 或 .xlsx)</p>
-            <p v-if="!isJsonFile" class="error-message">请上传一个有效的样表Excel文件(.xlsx 或 .xlsx)</p>
+            <p v-if="!allIsExcelFile" class="error-message">请上传若干个有效的Excel文件(.xls 或 .xlsx)</p>
+            <p v-if="!isExcelFile" class="error-message">请上传一个有效的样表Excel文件(.xlsx 或 .xlsx)</p>
         </div>
     </div>
-    <button @click="goBack">return</button>
 
 
 </template>

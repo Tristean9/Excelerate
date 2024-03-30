@@ -59,3 +59,50 @@ WARNING: This is a development server. Do not use it in a production deployment.
  * Running on http://127.0.0.1:1129
 Press CTRL+C to quit
  * Restarting with stat
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 103-058-274
+127.0.0.1 - - [29/Mar/2024 14:21:21] "POST /save_rawFile HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "flask\app.py", line 1488, in __call__
+  File "flask\app.py", line 1466, in wsgi_app
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 1463, in wsgi_app
+  File "flask\app.py", line 872, in full_dispatch_request
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 870, in full_dispatch_request
+  File "flask\app.py", line 855, in dispatch_request
+  File "app.py", line 32, in save_raw_file
+  File "utils\excel_processor.py", line 91, in convert_excel_format
+FileNotFoundError: [Errno 2] No such file or directory: 'G:\\Undergraduate\\ChallengeCup\\Excelerate\\electron\\tmp\\temp.xls'
+127.0.0.1 - - [29/Mar/2024 14:21:33] "POST /save_rawFile HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "flask\app.py", line 1488, in __call__
+  File "flask\app.py", line 1466, in wsgi_app
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 1463, in wsgi_app
+  File "flask\app.py", line 872, in full_dispatch_request
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 870, in full_dispatch_request
+  File "flask\app.py", line 855, in dispatch_request
+  File "app.py", line 32, in save_raw_file
+  File "utils\excel_processor.py", line 91, in convert_excel_format
+FileNotFoundError: [Errno 2] No such file or directory: 'G:\\Undergraduate\\ChallengeCup\\Excelerate\\electron\\tmp\\temp.xls'
+127.0.0.1 - - [29/Mar/2024 14:22:23] "POST /save_rawFile HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "flask\app.py", line 1488, in __call__
+  File "flask\app.py", line 1466, in wsgi_app
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 1463, in wsgi_app
+  File "flask\app.py", line 872, in full_dispatch_request
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 870, in full_dispatch_request
+  File "flask\app.py", line 855, in dispatch_request
+  File "app.py", line 32, in save_raw_file
+  File "utils\excel_processor.py", line 91, in convert_excel_format
+FileNotFoundError: [Errno 2] No such file or directory: 'G:\\Undergraduate\\ChallengeCup\\Excelerate\\electron\\tmp\\temp.xls'

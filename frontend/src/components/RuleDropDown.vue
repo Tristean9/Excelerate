@@ -9,7 +9,7 @@ import 'primevue/resources/themes/saga-blue/theme.css' // 主题
 import 'primevue/resources/primevue.min.css' // 核心样式
 import 'primeicons/primeicons.css' // 图标
 
-import { ref, computed, reactive, defineProps, defineEmits, watch, onMounted } from 'vue';
+import { ref, computed, reactive,  watch, onMounted } from 'vue';
 
 // 定义props接收entries
 const props = defineProps({

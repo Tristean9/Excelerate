@@ -28,3 +28,14 @@ electron/release-builds/myDesktopApp-win32-x64/resources/app/rules/predefined_ru
 electron/resources/app.exe
 electron/release-builds/myDesktopApp-win32-x64.zip
 electron/release-builds/myDesktopApp-win32-x64/resources/app/rules/predefined_rules.json
+backend/tests/for_concat/copy_style/colorful_sheet.xlsx
+backend/tests/for_concat/copy_style/copy_color_all_sheet.xlsx
+backend/tests/for_concat/copy_style/copy_color_sheet.xlsx
+backend/tests/for_concat/copy_style/nima.xlsx
+backend/tests/for_concat/for_func1_acquire_excel_groups/叉院.xlsx
+backend/tests/for_concat/for_func1_acquire_excel_groups/城环.xlsx
+backend/tests/for_concat/for_func1_acquire_excel_groups/地空.xlsx
+backend/tests/for_concat/for_func2_extract_template_info/仅含表头的总表1_基于样表1_无数据.xlsx
+backend/tests/for_concat/for_func2_extract_template_info/仅含表头的总表2_基于样表2_有数据.xlsx
+backend/tests/for_concat/for_func2_extract_template_info/样表1_无数据.xlsx
+backend/tests/for_concat/for_func2_extract_template_info/样表2_有数据.xlsx

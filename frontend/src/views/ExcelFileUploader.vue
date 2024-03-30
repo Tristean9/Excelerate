@@ -36,6 +36,7 @@ const uploadAndLoadExcelFile = async () => {
 
       // 向服务器发送上传的文件，并获得转换后的文件
       const response = await http.post('/save_rawFile', formData, { responseType: "blob" });
+      console.log("response.data",response.data);
 
       // 更新 Vuex 中的状态
       await store.dispatch('fetchProcessedExcelData', response.data);

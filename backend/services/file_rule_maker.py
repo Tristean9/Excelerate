@@ -48,6 +48,7 @@ class FileRuleMaker:#进一步：考虑将Xio对象作为FileRuleMaker的属性�
             return self.file_stream
         elif self.file_name.endswith("xls"):
             self.file_stream=self.Xio.convert_excel_format(self.file_stream,"xls","xlsx",True)
+            
             return self.file_stream#进一步：后端转化格式。修改self.excel_got变量
         else:raise TypeError#进一步：报错内容文本商讨。后端传输代号，前端呈现错误信息。
         

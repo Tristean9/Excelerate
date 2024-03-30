@@ -7,6 +7,11 @@ import ExcelFieldRuleShower from "@/views/ExcelFieldRuleShower.vue";
 
 import ExcelRuleUploader from "@/views/ExcelRuleUploader.vue";
 import ExcelDataChecker from "@/views/ExcelDataChecker.vue";
+
+import ContactUploader from "@/views/ContactUploader.vue";
+import ExampleDataSelector from "@/views/ExampleDataSelector.vue"
+import ContactChecker from "@/views/ContactChecker.vue";
+
 import Home from "@/views/Home.vue";
 
 const routes = [
@@ -44,6 +49,21 @@ const routes = [
         path: "/excel-data-checker/",
         name: "ExcelDataChecker",
         component: ExcelDataChecker
+    },
+    {
+        path: "/contact-uploader/",
+        name: "ContactUploader",
+        component: ContactUploader
+    },
+    {
+        path: "/example-data-selector/",
+        name: "ExampleDataSelector",
+        component: ExampleDataSelector
+    },
+    {
+        path: "/contact-checker/",
+        name: "ContactChecker",
+        component: ContactChecker
     },
 ]
 

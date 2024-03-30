@@ -15,7 +15,10 @@ import * as GC from '@grapecity/spread-sheets'
 
 
 const spread = ref(null);
-const spreadStyles = { width: "1200px", height: "600px" };
+const spreadStyles = computed(() => {
+  return { width: '100%', height: '600px' };
+});
+
 const isErrorModalVisible = ref(false);
 const errorModalText = ref('');
 
@@ -127,7 +130,7 @@ const bindCellClickForActiveSheet = () => {
             // alert('不可以选中空单元格');
             errorModalText.value = '不可以选中空单元格';
             isErrorModalVisible.value = true;
-            console.log("isErrorModalVisible",isErrorModalVisible,);
+            console.log("isErrorModalVisible", isErrorModalVisible,);
 
             isInvalidSelection = true;
             break;
@@ -161,22 +164,28 @@ const bindCellClickForActiveSheet = () => {
 
 const sendFiledNames = async () => {
   try {
-    const formData = new FormData();
-    formData.append('fields', JSON.stringify(selectedFields.value));
+    if (selectedFields.value.length > 0) {
+      const formData = new FormData();
+      console.log("selectedFields.value", selectedFields.value);
+      formData.append('fields', JSON.stringify(selectedFields.value));
 
-    const response = await http.post('/generate_user_rule_dict', formData);
+      const response = await http.post('/generate_user_rule_dict', formData);
 
-    // 分发action 更新store中的状态
-    await store.dispatch('fetchRulesData', response.data);
-    // console.log("服务器响应：", response.data);
+      // 分发action 更新store中的状态
+      await store.dispatch('fetchRulesData', response.data);
+      // console.log("服务器响应：", response.data);
 
-    const rulesData = computed(() => store.state.rulesData);
-    if (rulesData.value) {
-      // 跳转到规则指定模块
-      // console.log(rulesData.value)
-      await router.push({ name: 'ExcelFieldRuleMaker' });
+      const rulesData = computed(() => store.state.rulesData);
+      if (rulesData.value) {
+        // 跳转到规则指定模块
+        // console.log(rulesData.value)
+        await router.push({ name: 'ExcelFieldRuleMaker' });
+      }
+      // 处理响应，例如：显示成功消息或处理错误
+    } else {
+      errorModalText.value = "请至少选择一个规则字段"
+      isErrorModalVisible.value = true;
     }
-    // 处理响应，例如：显示成功消息或处理错误
   } catch (error) {
     console.error('发送数据失败:', error);
   }
@@ -220,65 +229,55 @@ const goHome = () => {
   <div class="title-container">
     <div class="title-text">字段选择</div>
   </div>
-  <div>
-    <div class="excel-container">
-      <div class="excel-area">
-        <div id="excel-tools">
-          <!--<button @click="toggleFontColor" > 切换字体颜色</button>
+  <div class="excel-container">
+    <div class="excel-area">
+      <div class="excel-tools">
+        <!--<button @click="toggleFontColor" > 切换字体颜色</button>
           <button @click="toggleHighlightCells">切换背景高亮</button>-->
-          <div class="detail-box" v-if="selectedCellText">
-            <!-- 这里显示选中单元格的文本内容 -->
-            <div class="cell-details">{{ selectedCellText }}</div>
-          </div>
+        <div class="detail-box" v-if="selectedCellText">
+          <!-- 这里显示选中单元格的文本内容 -->
+          <div class="cell-details">{{ selectedCellText }}</div>
         </div>
-
-        <gc-spread-sheets :hostStyle="spreadStyles" @workbookInitialized="initSpread">
-          <gc-worksheet></gc-worksheet>
-        </gc-spread-sheets>
-      </div>
-      <div id="tip-container">
-        <div class="tip-texts">请在左侧表格中点击需为其设立规则的表头（字段），选中的字段会显示在右侧</div>
-        <div id="column">
-          <table>
-            <thead>
-              <tr>
-                <th>位置</th>
-                <th>字段名</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in selectedFields" :key="index">
-                <td>{{ item.position }}</td>
-                <td>{{ item.fieldName }}</td>
-                <td><button @click="removeField(index)">删除</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <button v-if="Object.keys(selectedFields).length > 0" @click="sendFiledNames">发送规则字段</button>
       </div>
 
+      <gc-spread-sheets :hostStyle="spreadStyles" @workbookInitialized="initSpread">
+        <gc-worksheet></gc-worksheet>
+      </gc-spread-sheets>
     </div>
+    <div class="tip-container">
+      <div class="tip-texts">请在左侧表格中点击需为其设立规则的表头（字段），选中的字段会显示在右侧</div>
+      <div id="column">
+        <table>
+          <thead>
+            <tr>
+              <th>位置</th>
+              <th>字段名</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in selectedFields" :key="index">
+              <td>{{ item.position }}</td>
+              <td>{{ item.fieldName }}</td>
+              <td><button @click="removeField(index)">删除</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button v-if="Object.keys(selectedFields).length > 0" @click="sendFiledNames">发送规则字段</button>
+    </div>
+
+
   </div>
-  <error-modal  :text="errorModalText" :is-visible="isErrorModalVisible"  @update:isVisible="isErrorModalVisible = $event"/>
+  <error-modal :text="errorModalText" :is-visible="isErrorModalVisible"
+    @update:isVisible="isErrorModalVisible = $event" />
 
 </template>
 
 <style scoped>
-#excel-area {
-  margin-bottom: 20px;
+#tip-container button {
+  margin-top: auto;
 }
-
-
-#tip-container {
-
-  display: flex;
-  flex-direction: column;
-
-}
-
-
 
 table {
   width: 100%;
@@ -298,10 +297,5 @@ th {
 
 tr:nth-child(even) {
   background-color: #f2f2f2;
-}
-
-
-#tip-container button {
-  margin-top: auto;
 }
 </style>

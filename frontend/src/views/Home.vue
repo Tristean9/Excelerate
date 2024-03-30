@@ -22,6 +22,7 @@ onMounted(() => {
         <div class="menu">
             <router-link :to="{ name: 'ExcelFileUploader' }"><button>规则制定</button></router-link>
             <router-link :to="{ name: 'ExcelRuleUploader' }"><button>数据检验</button></router-link>
+            <router-link :to="{ name: 'ContactUploader' }"><button>合并文件</button></router-link>
         </div>
     </div>
 
