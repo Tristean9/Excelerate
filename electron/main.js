@@ -17,6 +17,7 @@ const createWindow = () => {
         webPreferences: {
             nodeIntegration: true
         },
+        icon: path.join(__dirname, 'public/favicon2.ico'), // 设置窗口图标的路径
         show: false // 先不显示窗口, 等待最大化后再显示
     });
 

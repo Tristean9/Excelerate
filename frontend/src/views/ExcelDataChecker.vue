@@ -17,6 +17,7 @@ const spreadStyles = computed(() => {
     return { width: '100%', height: '600px' };
 });
 
+const checkedExcelFileName = computed(() => store.state.checkedExcelFileName);
 const checkedExcelBlob = computed(() => store.state.checkedExcelBlob); // 从上个上传页面计算得来
 const currentExcelBlob = ref(checkedExcelBlob.value); // 储存当前的Excel的Blob
 
@@ -24,26 +25,8 @@ console.log("currentExcelBlob:", currentExcelBlob);
 
 const errorPosition = computed(() => store.state.errorPosition); // 从上个上传页面计算得来
 const currentErrorPosition = ref(errorPosition.value);
-console.log('currentErrorPosition: ', currentErrorPosition); // 储存当前的error位置
+console.log('currentErrorPosition: ', currentErrorPosition.value); // 储存当前的error位置
 
-const positionRule = computed(() => store.state.positionRule);
-console.log("positionRule:", positionRule);
-// 创建一个计算属性来根据currentErrorPosition获取子集
-const currentErrorAndReason = computed(() => {
-    let subset = {};
-    currentErrorPosition.value.forEach((position) => {
-        // console.log("position:", position.toLowerCase());
-        // console.log("positionRule:", Object.keys(positionRule.value));
-        if (Object.keys(positionRule.value).includes(position.toLowerCase())) {
-            // console.log("positionRule.value[position:",positionRule.value[position.toLowerCase()]);
-            subset[position.toLowerCase()] = positionRule.value[position.toLowerCase()][1];
-        }
-    });
-    // console.log("subset", subset);
-    return subset;
-});
-
-console.log("currentErrorAndReason:", currentErrorAndReason.value);
 const initSpread = (s) => {
     spread.value = s;
     loadAndDisplayExcelContent(currentExcelBlob)
@@ -119,11 +102,11 @@ const checkExcelData = async () => {
 
         // console.log('response', response.data.checked_excel
         const base64String = response.data.checked_excel
-        const newErrorPosition = response.data.error_index_col
+        const newErrorPosition = response.data.error_cell_info
 
-
+        console.log("response.data.error_cell_info", response.data.error_cell_info);
         // 将Base64编码文件转换成Blob对象
-        const fileBlobData = base64ToBlob(base64String, 'application/vnd.ms-excel');
+        const fileBlobData = base64ToBlob(base64String, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
         // console.log("fileBlobData:", fileBlobData);
         // console.log("newErrorPosition:", newErrorPosition);
@@ -138,18 +121,35 @@ const checkExcelData = async () => {
     }, (error) => {
         console.error("error: ", error)
     }, options);
-
-
 }
+
+const showErrorModal = (position) => {
+    selectedErrorPosition.value = position;
+    isModalVisible.value = true;  // 显示模态框
+};
+
+const selectedErrorPosition = ref(''); // 存储选中的错误位置
+const isModalVisible = ref(false); // 控制模态框是否显示
+
+// 假设每行显示5个错误位置
+const errorTable = computed(() => {
+    const errors = Object.keys(currentErrorPosition.value);
+    const rows = [];
+
+    for (let i = 0; i < errors.length; i += 4) {
+        rows.push(errors.slice(i, i + 4).map(position => ({ position })));
+    }
+
+    return rows;
+});
 
 const isModalVisible1 = ref(false)
 const isModalVisible2 = ref(false)
 
 const saveExcel = () => {
     console.log("currentErrorPosition", currentErrorPosition.value);
-
-    if (currentErrorPosition.value.length > 0) {
-        console.log(111);
+    console.log("Object.keys(currentErrorPosition).length",Object.keys(currentErrorPosition.value).length);
+    if (Object.keys(currentErrorPosition.value).length > 0) {
         isModalVisible1.value = true;
     } else {
         isModalVisible2.value = true
@@ -163,7 +163,7 @@ const confirmSave = () => {
 
     isModalVisible1.value = false;
     spread.value.export((blob) => {
-        saveAs(blob, 'ddd.xlsx')
+        saveAs(blob, `检验后-${checkedExcelFileName.value}.xlsx`)
         // 设置一个定时器，延时关闭模态框
         setTimeout(() => {
             isModalVisible2.value = false;
@@ -215,13 +215,27 @@ const goHome = () => {
                 <button @click="checkExcelData">检查</button>
             </div>
             <div id="error-position">
-                <template v-if="currentErrorPosition.length > 0">
-                    <h2>以下是可能存在问题的数据的位置及原因</h2>
-                    <h3>{{ currentErrorAndReason }}</h3>
+                <template v-if="Object.keys(currentErrorPosition).length > 0">
+                    <h2>以下是可能存在问题的数据的位置,可点击查看解释</h2>
+                    <table>
+                        <tr v-for="row in errorTable" :key="row[0]">
+                            <td v-for="cell in row" :key="cell.position" @click="showErrorModal(cell.position)"
+                                class="error-cell">
+                                {{ cell.position }}
+                            </td>
+                        </tr>
+                    </table>
                 </template>
                 <template v-else>
                     <h2>您的数据经检验已无问题</h2>
                 </template>
+                <div v-if="isModalVisible" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-content-text">{{ currentErrorPosition[selectedErrorPosition] }}</div>
+                        <div><button @click="isModalVisible = false">关闭</button></div>
+                    </div>
+                    
+                </div>
             </div>
 
             <button @click="saveExcel">保存</button>
@@ -230,7 +244,7 @@ const goHome = () => {
     </div>
     <div v-if="isModalVisible1" class="modal">
         <div class="modal-content">
-            <p>您的数据可能依然存在问题，是否继续保存？</p>
+            <div class="modal-content-text">您的数据可能依然存在问题，是否继续保存？</div>
             <div class="button-container">
                 <button @click="confirmSave">是</button>
                 <button @click="cancelSave">否</button>
@@ -239,7 +253,7 @@ const goHome = () => {
     </div>
     <div v-if="isModalVisible2" class="modal">
         <div class="modal-content">
-            <p>您的数据经检查已无问题，正在为您保存</p>
+            <div class="modal-content-text">您的数据经检查已无问题，正在为您保存</div>
         </div>
     </div>
 
@@ -255,9 +269,36 @@ const goHome = () => {
 .table {
     width: 100%;
 }
-.button-container {
-    justify-content: space-between; /* 可以改为 space-around 或 space-evenly */
+
+.error-cell {
+    cursor: pointer;
+    background-color: #f9f9f9;
+    /* 轻微背景颜色 */
+    padding: 5px;
+    border: 1px solid #eee;
+    text-align: center;
 }
+
+.error-cell:hover {
+    background-color: #e1e1e1;
+    /* 悬停时的背景颜色 */
+}
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.button-container {
+    justify-content: space-between;
+    /* 可以改为 space-around 或 space-evenly */
+}
+
 #button-check {
     display: flex;
     flex-direction: column;
@@ -267,23 +308,8 @@ const goHome = () => {
     text-align: center;
 }
 
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+#error-position .modal-content {
+    height: auto;
 }
 
-.modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
-    text-align: center;
-}
 </style>

@@ -12,6 +12,9 @@ import ContactUploader from "@/views/ContactUploader.vue";
 import ExampleDataSelector from "@/views/ExampleDataSelector.vue"
 import ContactChecker from "@/views/ContactChecker.vue";
 
+import SplitUploader from "@/views/SplitUploader.vue";
+import SplitSelector from "@/views/SplitSelector.vue";
+
 import Home from "@/views/Home.vue";
 
 const routes = [
@@ -64,6 +67,16 @@ const routes = [
         path: "/contact-checker/",
         name: "ContactChecker",
         component: ContactChecker
+    },
+    {
+        path: "/split-uploader/",
+        name: "SplitUploader",
+        component: SplitUploader
+    },
+    {
+        path: "/split-selector/",
+        name: "SplitSelector",
+        component: SplitSelector
     },
 ]
 

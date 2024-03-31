@@ -4,6 +4,10 @@ import { ref } from 'vue';
 import { useStore } from "vuex";
 import http from "@/api/http.js";
 import router from "@/router/index.js";
+import UploadStatusModal from '@/components/UploadStatusModal.vue';
+
+const isModalVisible = ref(false); // 控制模态框是否显示
+const modalMessage = ref(''); // 模态框消息
 
 const store = useStore();
 const excelFiles = ref([]);
@@ -45,23 +49,30 @@ const uploadExcelFiles = async () => {
         console.error("文件格式不正确，请上传有效的Excel文件。");
         return;
     }
-    // 构建一个FormData对象来发送文件
-    const formData = new FormData();
-    excelFiles.value.forEach(file => {
-        formData.append('excelFiles', file);
-    });
-    formData.append('exampleFile', exampleFile.value);
+    isModalVisible.value = true; // 显示模态框
+    modalMessage.value = '正在上传并处理中，请稍后';
+    try {
+        // 构建一个FormData对象来发送文件
+        const formData = new FormData();
+        excelFiles.value.forEach(file => {
+            formData.append('excelFiles', file);
+        });
+        formData.append('exampleFile', exampleFile.value);
 
-    const response = await http.post('/load-excelFiles-example', formData,
-        { responseType: "blob" }
-    );
-    console.log("response.data", response.data);
+        const response = await http.post('/load-excelFiles-example', formData,
+            { responseType: "blob" }
+        );
+        console.log("response.data", response.data);
 
-    const exampleExcelBlob = response.data;
+        const exampleExcelBlob = response.data;
 
-    await store.dispatch('saveExampleExcelBlob', exampleExcelBlob)
-    await router.push({ name: 'ExampleDataSelector' });
-
+        await store.dispatch('saveExampleExcelBlob', exampleExcelBlob)
+        await router.push({ name: 'ExampleDataSelector' });
+    } catch (error) {
+        console.error("Error uploading file: ", error);
+        isModalVisible.value = true; // 显示模态框
+        modalMessage.value = '正在上传并处理中，请稍后';
+    }
 
 }
 </script>
@@ -90,6 +101,7 @@ const uploadExcelFiles = async () => {
             <p v-if="!isExcelFile" class="error-message">请上传一个有效的样表Excel文件(.xlsx 或 .xlsx)</p>
         </div>
     </div>
+    <UploadStatusModal :isVisible="isModalVisible" :message="modalMessage" />
 
 
 </template>

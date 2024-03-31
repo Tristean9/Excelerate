@@ -69,7 +69,7 @@ const sendFinalFormattedRules = async () => {
     const ruleDict = entry[1]
     console.log("base64String", base64String);
     console.log("ruleDict", ruleDict);
-    excelAndRuleData[mode] = [base64ToBlob(base64String, 'application/vnd.ms-excel'), ruleDict];
+    excelAndRuleData[mode] = [base64ToBlob(base64String, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"), ruleDict];
   }
 
   await store.dispatch('fetchExcelAndRuleData', excelAndRuleData);

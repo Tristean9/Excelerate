@@ -9,7 +9,7 @@ import { computed, ref } from "vue";
 import store from "@/store/index.js";
 import { saveAs } from 'file-saver';
 
-
+const excelFileName = computed(() => store.state.excelFileName);
 const currentMode = ref('2-2');
 const spread = ref(null);
 const spreadStyles = computed(() => {
@@ -105,7 +105,7 @@ const saveRuleFile = () => {
 
 const saveExcelFile = () => {
   spread.value.export((blob) => {
-    saveAs(blob, 'processed.xlsx');
+    saveAs(blob, `含规则-${ excelFileName.value }.xlsx`);
   }, (error) => {
     console.error("error: ", error);
   }, {});
@@ -177,7 +177,7 @@ const goHome = () => {
 }
 
 .mode-button {
-  background-image: linear-gradient(to right, #4fc3f7, #0288d1);
+  background-image: linear-gradient(to right, #c6c4c4, #c6c4c4);
   border: none;
   /* 移除边框 */
   color: white;
@@ -195,7 +195,7 @@ const goHome = () => {
 }
 
 .mode-button:hover {
-  background-image: linear-gradient(to right, #029be5, #0277bd);
+  background-image: linear-gradient(to right, #0e6590, #0277bd);
   /* 鼠标悬停时的背景变化 */
 }
 </style>

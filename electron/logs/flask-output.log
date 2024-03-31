@@ -106,3 +106,27 @@ Traceback (most recent call last):
   File "app.py", line 32, in save_raw_file
   File "utils\excel_processor.py", line 91, in convert_excel_format
 FileNotFoundError: [Errno 2] No such file or directory: 'G:\\Undergraduate\\ChallengeCup\\Excelerate\\electron\\tmp\\temp.xls'
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 369-682-020
+127.0.0.1 - - [30/Mar/2024 13:15:01] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [30/Mar/2024 13:15:01] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [30/Mar/2024 13:15:12] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [30/Mar/2024 13:15:21] "POST /generate_user_rule_dict HTTP/1.1" 200 -
+127.0.0.1 - - [30/Mar/2024 13:15:29] "POST /create_final_rules_and_examples HTTP/1.1" 200 -
+127.0.0.1 - - [30/Mar/2024 13:15:52] "POST /load-excelFiles-example HTTP/1.1" 200 -
+127.0.0.1 - - [30/Mar/2024 13:16:01] "POST /extract_example_info HTTP/1.1" 200 -
+127.0.0.1 - - [30/Mar/2024 13:16:02] "POST /contact HTTP/1.1" 200 -
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 139-638-277

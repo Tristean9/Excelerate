@@ -119,10 +119,14 @@ const sendData = async () => {
 
         try {
             const response = await http.post('/extract_example_info', formData);
-            console.log('Data sent successfully', response);
 
-            router.push({name: "ContactChecker"})
-            
+            console.log("response.data",response.data);
+            store.dispatch('fetchRecheckExcelInfo', response.data)
+            // const recheckExcelInfo = response.data;
+            // console.log("checkedCount", checkedCount);
+
+            router.push({ name: "ContactChecker" })
+
         } catch (error) {
             console.error('Failed to send data', error);
         }
