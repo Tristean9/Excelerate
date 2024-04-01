@@ -152,7 +152,7 @@ const goHome = () => {
       </div>
     </div>
     <div id="final-rules-container">
-      <h1>最终规则预览</h1>
+      <h1 style="font-size: 30px;">最终规则预览</h1>
       <!-- <h1>{{ selectedDropdowns }}</h1> -->
       <ul>
         <li v-for="(entry, position) in selectedDropdowns" :key="position" @click="showModal(entry)">
@@ -160,9 +160,9 @@ const goHome = () => {
           <span class="final-rule">{{ entry.resultArray.join(', ') }}</span>
         </li>
       </ul>
-      <button v-if="Object.keys(selectedDropdowns).length > 0" @click="sendFinalFormattedRules">保存并发送</button>
+      <button v-if="Object.keys(selectedDropdowns).length  > 0" @click="sendFinalFormattedRules" style="width: 180px;">保存并发送</button>
       <div v-if="isModalVisible" class="modal-overlay" @click="closeModal">
-        <div class="modal-content" @click.stop>
+        <div class="modal-content" @click.stop style="height: auto;width: auto;">
           <span class="close" @click="closeModal">&times;</span>
           <p>{{ modalContent }}</p>
         </div>
@@ -183,12 +183,13 @@ const goHome = () => {
   /* 让子元素靠近两端 */
   padding: 0 50px;
   /* 设置内边距为20像素，可以调整这个数值来控制边距大小 */
+  gap: 30px;
 }
 
 
 #rule-maker {
-  height: 500px;
-  min-width: 500px;
+  height: 650px;
+  min-width: 650px;
   display: flex;
   flex-direction: column;
   overflow: auto;
@@ -202,6 +203,10 @@ const goHome = () => {
   /* 每个子元素都将尝试占据相同的空间 */
   min-width: 0;
   /* 防止缩小到小于内容宽度 */
+  height: 650px;
+  min-width: 650px;
+  overflow: auto;
+
 
 }
 

@@ -47,6 +47,7 @@ const loadAndDisplayExcelContent = async (checkedExcelBlob) => {
 
     const options = {
         includeStyles: true,
+        includeUnusedStyles: false
     }
     if (checkedExcelBlob.value) {
         spread.value.import(checkedExcelBlob.value, () => {
@@ -148,7 +149,7 @@ const isModalVisible2 = ref(false)
 
 const saveExcel = () => {
     console.log("currentErrorPosition", currentErrorPosition.value);
-    console.log("Object.keys(currentErrorPosition).length",Object.keys(currentErrorPosition.value).length);
+    console.log("Object.keys(currentErrorPosition).length", Object.keys(currentErrorPosition.value).length);
     if (Object.keys(currentErrorPosition.value).length > 0) {
         isModalVisible1.value = true;
     } else {
@@ -163,14 +164,18 @@ const confirmSave = () => {
 
     isModalVisible1.value = false;
     spread.value.export((blob) => {
-        saveAs(blob, `检验后-${checkedExcelFileName.value}.xlsx`)
+        if (['xls'].includes(excelFileName.value.split('.').pop())) {
+            saveAs(blob, `检验后-${excelFileName.value}x`)
+        } else { saveAs(blob, `检验后-${excelFileName.value}`); }
         // 设置一个定时器，延时关闭模态框
         setTimeout(() => {
             isModalVisible2.value = false;
         }, 3000); // 这里的3000表示模态框将在3秒后消失
     }, (error) => {
         console.error("error: ", error)
-    }, {})
+    }, {
+        includeUnusedNames: false
+    })
     console.log('保存成功');
 }
 
@@ -230,11 +235,11 @@ const goHome = () => {
                     <h2>您的数据经检验已无问题</h2>
                 </template>
                 <div v-if="isModalVisible" class="modal">
-                    <div class="modal-content">
+                    <div class="modal-content" style="height: auto;width: auto;">
                         <div class="modal-content-text">{{ currentErrorPosition[selectedErrorPosition] }}</div>
                         <div><button @click="isModalVisible = false">关闭</button></div>
                     </div>
-                    
+
                 </div>
             </div>
 
@@ -311,5 +316,4 @@ const goHome = () => {
 #error-position .modal-content {
     height: auto;
 }
-
 </style>

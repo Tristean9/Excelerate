@@ -383,6 +383,7 @@ class Excel_attribute:
         def get_dropdowns_values(validation):
             result=validation.formula1
             
+            
             # 进一步，下拉列表不仅仅为序列
             # 若值为工作表单元格引用
             
@@ -416,7 +417,7 @@ class Excel_attribute:
         validations = self.excel_ws.data_validations.dataValidation
         #print(validations)
         for validation in validations:
-            
+            if validation.formula1==None:continue
             #当前有效性涉及区域
             cell=str(validation.sqref)
             

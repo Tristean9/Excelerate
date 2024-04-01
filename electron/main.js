@@ -11,7 +11,7 @@ let flaskProcess = null; // 用于跟踪 Flask 进程
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
-        titile: "Excelerate APP",
+        title: "Excelerate APP",
         width: 800,
         height: 600,
         webPreferences: {
@@ -21,6 +21,7 @@ const createWindow = () => {
         show: false // 先不显示窗口, 等待最大化后再显示
     });
 
+    console.log(path.join(__dirname, 'public/favicon2.ico'));
     // 取消菜单栏
     mainWindow.setMenu(null);
 
@@ -50,20 +51,10 @@ const createWindow = () => {
 
 
     flaskProcess.on('close', (code) => {
-        console.log(`Flask process exited with code ${code}`);
+        // console.log(`Flask process exited with code ${code}`);
         logStream.write(`Flask process exited with code ${code}`);
     });
 
-    // flaskProcess.stdout.on('data', (data) => {
-    //     console.log(`Flask stdout: ${data}`);
-    // });
-
-    // flaskProcess.stderr.on('data', (data) => {
-    //     console.error(`Flask stderr: ${data}`);
-    // });
-    // flaskProcess.on('close', (code) => {
-    //     console.log(`Flask process exited with code ${code}`);
-    // });
 
     // mainWindow.webContents.openDevTools();
 }

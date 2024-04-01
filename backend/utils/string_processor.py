@@ -27,6 +27,7 @@ def best_match(target, options):
     :return: 匹配度最高的字符串
     """
     # 获取匹配度最高的字符串,
+    target = str(target)
     matches = difflib.get_close_matches(target, options, n=1, cutoff=0.0)
     # 若没有或者甚至无共同字符，返回""
     if not matches:

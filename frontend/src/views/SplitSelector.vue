@@ -6,6 +6,7 @@ import http from "@/api/http.js";
 import router from "@/router/index.js";
 import store from "@/store/index.js";
 import { saveAs } from 'file-saver';
+import UploadStatusModal from '@/components/UploadStatusModal.vue';
 
 import '@grapecity/spread-sheets/styles/gc.spread.sheets.excel2016colorful.css';
 import { GcSpreadSheets, GcWorksheet } from '@grapecity/spread-sheets-vue';
@@ -24,6 +25,7 @@ const startRowError = ref(''); // 新增一个响应式引用，用于存储错�
 const referenceColumnError = ref(''); // 新增一个响应式引用，用于存储错误消息
 
 const isModalVisible = ref(false);
+const modalMessage = ref('');
 
 const initSpread = (s) => {
     spread.value = s;
@@ -90,7 +92,7 @@ const validateRowInput = (event) => {
 
 const validateColumnInput = (event) => {
     const value = event.target.value;
-    const columnPattern = /^[A-Z]{1,3}$/;; // 正则表达式，用于检测是否仅包含数字
+    const columnPattern = /^[A-Za-z]{1,3}$/;; // 正则表达式，用于检测是否仅包含数字
     if (columnPattern.test(value)) {
         referenceColumn.value = value;
         referenceColumnError.value = '';
@@ -111,8 +113,9 @@ const sendData = async () => {
 
         try {
             isModalVisible.value = true;
-            const response = await http.post('/load_split_parameters', formData,{ responseType: "blob" });
-            
+            modalMessage.value = '正在上传并处理中，请稍候';
+            const response = await http.post('/load_split_parameters', formData, { responseType: "blob" });
+
             saveAs(response.data, '拆分后的数据.zip')
             isModalVisible.value = false;
             // console.log("response.data", response.data);
@@ -168,7 +171,7 @@ const goHome = () => {
                     min="1" />
             </div>
             <div class="input-container">
-                <label for="referenceColumnInput" class="input-label">请输入需拆分列字母：</label>
+                <label for="referenceColumnInput" class="input-label">请输入拆分所依据的列号：</label>
                 <input type="text" id="referenceColumnInput" class="input-field" :value="referenceColumn"
                     @input="validateColumnInput" min="1" />
             </div>
@@ -180,11 +183,7 @@ const goHome = () => {
 
 
     </div>
-    <div v-if="isModalVisible" class="modal">
-        <div class="modal-content">
-            <div class="modal-content-text">正在为您拆分文件</div>
-        </div>
-    </div>
+    <UploadStatusModal :isVisible="isModalVisible" :message="modalMessage" />
 
 
 </template>

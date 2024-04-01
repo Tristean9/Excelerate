@@ -55,7 +55,7 @@ const uploadAndLoadExcelFile = async () => {
     } catch (error) {
       console.error("Error uploading file: ", error);
       isModalVisible.value = true; // 显示模态框
-      modalMessage.value = '正在上传并处理中，请稍后';
+      modalMessage.value = '正在上传并处理中，请稍候';
     }
   } else {
     console.log("No file selected!");

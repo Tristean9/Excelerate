@@ -71,7 +71,7 @@ const uploadExcelFiles = async () => {
     } catch (error) {
         console.error("Error uploading file: ", error);
         isModalVisible.value = true; // 显示模态框
-        modalMessage.value = '正在上传并处理中，请稍后';
+        modalMessage.value = '正在上传并处理中，请稍候';
     }
 
 }
@@ -95,7 +95,7 @@ const uploadExcelFiles = async () => {
                 <input class="fileLoader" type="file" accept=".xlsx,.xls" @change="handledExcelFileSelection"
                     multiple />
                 <input class="fileLoader" type="file" accept=".xlsx, .xls" @change="handledExampleFileSelection" />
-                <button @click="uploadExcelFiles">上传</button>
+                <button @click="uploadExcelFiles">打开</button>
             </div>
             <p v-if="!allIsExcelFile" class="error-message">请上传若干个有效的Excel文件(.xls 或 .xlsx)</p>
             <p v-if="!isExcelFile" class="error-message">请上传一个有效的样表Excel文件(.xlsx 或 .xlsx)</p>

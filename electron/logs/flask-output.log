@@ -130,3 +130,301 @@ Press CTRL+C to quit
  * Restarting with stat
  * Debugger is active!
  * Debugger PIN: 139-638-277
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 664-588-450
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 235-623-662
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 753-025-635
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 114-427-013
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 104-151-472
+127.0.0.1 - - [31/Mar/2024 23:31:43] "POST /save_rawFile HTTP/1.1" 200 -
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 100-763-005
+127.0.0.1 - - [31/Mar/2024 23:45:03] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [31/Mar/2024 23:45:07] "POST /generate_user_rule_dict HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "flask\app.py", line 1488, in __call__
+  File "flask\app.py", line 1466, in wsgi_app
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 1463, in wsgi_app
+  File "flask\app.py", line 872, in full_dispatch_request
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 870, in full_dispatch_request
+  File "flask\app.py", line 855, in dispatch_request
+  File "app.py", line 69, in generate_user_rule_dict
+  File "services\file_rule_maker.py", line 95, in generate_user_rule_dict
+  File "utils\excel_processor.py", line 424, in get_dropdowns
+  File "utils\excel_processor.py", line 391, in get_dropdowns_values
+  File "re\__init__.py", line 177, in search
+TypeError: expected string or bytes-like object, got 'NoneType'
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 227-638-915
+127.0.0.1 - - [31/Mar/2024 23:46:53] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [31/Mar/2024 23:46:56] "POST /generate_user_rule_dict HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "flask\app.py", line 1488, in __call__
+  File "flask\app.py", line 1466, in wsgi_app
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 1463, in wsgi_app
+  File "flask\app.py", line 872, in full_dispatch_request
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 870, in full_dispatch_request
+  File "flask\app.py", line 855, in dispatch_request
+  File "app.py", line 69, in generate_user_rule_dict
+  File "services\file_rule_maker.py", line 95, in generate_user_rule_dict
+  File "utils\excel_processor.py", line 424, in get_dropdowns
+  File "utils\excel_processor.py", line 391, in get_dropdowns_values
+  File "re\__init__.py", line 177, in search
+TypeError: expected string or bytes-like object, got 'NoneType'
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 125-761-249
+127.0.0.1 - - [31/Mar/2024 23:54:41] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [31/Mar/2024 23:55:15] "POST /generate_user_rule_dict HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "flask\app.py", line 1488, in __call__
+  File "flask\app.py", line 1466, in wsgi_app
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 1463, in wsgi_app
+  File "flask\app.py", line 872, in full_dispatch_request
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 870, in full_dispatch_request
+  File "flask\app.py", line 855, in dispatch_request
+  File "app.py", line 69, in generate_user_rule_dict
+  File "services\file_rule_maker.py", line 95, in generate_user_rule_dict
+  File "utils\excel_processor.py", line 424, in get_dropdowns
+  File "utils\excel_processor.py", line 391, in get_dropdowns_values
+  File "re\__init__.py", line 177, in search
+TypeError: expected string or bytes-like object, got 'NoneType'
+127.0.0.1 - - [31/Mar/2024 23:55:28] "POST /generate_user_rule_dict HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "flask\app.py", line 1488, in __call__
+  File "flask\app.py", line 1466, in wsgi_app
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 1463, in wsgi_app
+  File "flask\app.py", line 872, in full_dispatch_request
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 870, in full_dispatch_request
+  File "flask\app.py", line 855, in dispatch_request
+  File "app.py", line 69, in generate_user_rule_dict
+  File "services\file_rule_maker.py", line 95, in generate_user_rule_dict
+  File "utils\excel_processor.py", line 424, in get_dropdowns
+  File "utils\excel_processor.py", line 391, in get_dropdowns_values
+  File "re\__init__.py", line 177, in search
+TypeError: expected string or bytes-like object, got 'NoneType'
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 245-183-228
+127.0.0.1 - - [01/Apr/2024 00:16:13] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 00:16:15] "POST /generate_user_rule_dict HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "flask\app.py", line 1488, in __call__
+  File "flask\app.py", line 1466, in wsgi_app
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 1463, in wsgi_app
+  File "flask\app.py", line 872, in full_dispatch_request
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 870, in full_dispatch_request
+  File "flask\app.py", line 855, in dispatch_request
+  File "app.py", line 69, in generate_user_rule_dict
+  File "services\file_rule_maker.py", line 95, in generate_user_rule_dict
+  File "utils\excel_processor.py", line 424, in get_dropdowns
+  File "utils\excel_processor.py", line 391, in get_dropdowns_values
+  File "re\__init__.py", line 177, in search
+TypeError: expected string or bytes-like object, got 'NoneType'
+127.0.0.1 - - [01/Apr/2024 00:16:47] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 00:16:51] "POST /generate_user_rule_dict HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 00:17:00] "POST /generate_user_rule_dict HTTP/1.1" 200 -
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 458-787-320
+127.0.0.1 - - [01/Apr/2024 00:19:13] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 00:19:16] "POST /generate_user_rule_dict HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "flask\app.py", line 1488, in __call__
+  File "flask\app.py", line 1466, in wsgi_app
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 1463, in wsgi_app
+  File "flask\app.py", line 872, in full_dispatch_request
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 870, in full_dispatch_request
+  File "flask\app.py", line 855, in dispatch_request
+  File "app.py", line 69, in generate_user_rule_dict
+  File "services\file_rule_maker.py", line 95, in generate_user_rule_dict
+  File "utils\excel_processor.py", line 424, in get_dropdowns
+  File "utils\excel_processor.py", line 391, in get_dropdowns_values
+  File "re\__init__.py", line 177, in search
+TypeError: expected string or bytes-like object, got 'NoneType'
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 554-321-175
+127.0.0.1 - - [01/Apr/2024 00:20:58] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 00:22:14] "POST /generate_user_rule_dict HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "flask\app.py", line 1488, in __call__
+  File "flask\app.py", line 1466, in wsgi_app
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 1463, in wsgi_app
+  File "flask\app.py", line 872, in full_dispatch_request
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 870, in full_dispatch_request
+  File "flask\app.py", line 855, in dispatch_request
+  File "app.py", line 69, in generate_user_rule_dict
+  File "services\file_rule_maker.py", line 95, in generate_user_rule_dict
+  File "utils\excel_processor.py", line 424, in get_dropdowns
+  File "utils\excel_processor.py", line 391, in get_dropdowns_values
+  File "re\__init__.py", line 177, in search
+TypeError: expected string or bytes-like object, got 'NoneType'
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 144-780-072
+127.0.0.1 - - [01/Apr/2024 00:49:18] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 00:49:23] "POST /generate_user_rule_dict HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 00:49:28] "POST /create_final_rules_and_examples HTTP/1.1" 200 -
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 143-916-337
+127.0.0.1 - - [01/Apr/2024 00:51:10] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 00:51:13] "POST /generate_user_rule_dict HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 00:51:35] "POST /create_final_rules_and_examples HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 00:52:24] "POST /load_and_check_data HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "flask\app.py", line 1488, in __call__
+  File "flask\app.py", line 1466, in wsgi_app
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 1463, in wsgi_app
+  File "flask\app.py", line 872, in full_dispatch_request
+  File "flask_cors\extension.py", line 176, in wrapped_function
+  File "flask\app.py", line 870, in full_dispatch_request
+  File "flask\app.py", line 855, in dispatch_request
+  File "app.py", line 117, in load_and_check_data
+  File "services\file_validator.py", line 91, in get_files_stream
+  File "utils\excel_processor.py", line 46, in load_workbook_from_stream
+  File "utils\excel_processor.py", line 28, in read_excel_file
+  File "openpyxl\reader\excel.py", line 346, in load_workbook
+  File "openpyxl\reader\excel.py", line 291, in read
+  File "openpyxl\reader\excel.py", line 153, in read_workbook
+  File "openpyxl\reader\workbook.py", line 46, in parse
+  File "openpyxl\descriptors\serialisable.py", line 87, in from_tree
+  File "openpyxl\descriptors\serialisable.py", line 87, in from_tree
+  File "openpyxl\descriptors\serialisable.py", line 103, in from_tree
+TypeError: DefinedName.__init__() got an unexpected keyword argument 'isReadOnly'
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 488-767-160
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 404-967-955
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:1129
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 396-169-448
+127.0.0.1 - - [01/Apr/2024 03:19:25] "POST /save_rawFile HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 03:19:29] "POST /generate_user_rule_dict HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 03:19:34] "POST /create_final_rules_and_examples HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 03:20:11] "POST /load_and_check_data HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 03:20:41] "POST /check_data HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 03:21:00] "POST /check_data HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 03:21:09] "POST /check_data HTTP/1.1" 200 -
+127.0.0.1 - - [01/Apr/2024 03:21:13] "POST /check_data HTTP/1.1" 200 -

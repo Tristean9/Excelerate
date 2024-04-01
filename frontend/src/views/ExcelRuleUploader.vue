@@ -59,7 +59,7 @@ const uploadAndLoadExcelFile = async () => {
     // if (excelFile.value && ruleFile.value) {
     if (excelFile.value && isExcelFile.value && isJsonFile.value) {
         isModalVisible.value = true; // 显示模态框
-        modalMessage.value = '正在上传并处理中，请稍后';
+        modalMessage.value = '正在上传并处理中，请稍候';
         try {
             const formData = new FormData();
             formData.append('excelFile', excelFile.value);
@@ -120,7 +120,7 @@ const goHome = () => {
             <div class="uploader">
                 <input class="fileLoader" type="file" accept=".xlsx,.xls" @change="handledExcelFileSelection" />
                 <input class="fileLoader" type="file" accept=".json" @change="handledRuleFileSelection" />
-                <button @click="uploadAndLoadExcelFile">Open</button>
+                <button @click="uploadAndLoadExcelFile">打开</button>
             </div>
             <p v-if="!isExcelFile" class="error-message">请上传一个有效的Excel文件(.xls 或 .xlsx)</p>
             <p v-if="!isJsonFile" class="error-message">请上传一个有效的Json文件(.json)</p>

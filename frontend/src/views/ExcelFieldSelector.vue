@@ -65,14 +65,11 @@ const loadAndDisplayExcelContent = async (processedExcelBlob) => {
   const options = {
     includeStyles: true,
     includeFormulas: true,
+    includeUnusedStyles: false
   }
   if (processedExcelBlob.value) {
     if (spread.value) {
       spread.value.import(processedExcelBlob.value, () => {
-        for (let i = 0; i < spread.value.getSheetCount(); i++) {
-          let sheet = spread.value.getSheet(i);
-          sheet.options.isProtected = true; // 设置每个工作表为保护状态
-        }
         const sheet = spread.value.getActiveSheet();
         const minRowCount = 50;
         const minColumnCount = 50;
@@ -275,8 +272,14 @@ const goHome = () => {
 </template>
 
 <style scoped>
+
 #tip-container button {
   margin-top: auto;
+}
+
+#column {
+  overflow-y: auto;
+  max-height: 540px;
 }
 
 table {

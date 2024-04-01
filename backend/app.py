@@ -118,7 +118,7 @@ def load_and_check_data():
     # print(new_excel)
     error_cell_info, checked_excel = fileValidator.validate_filled_excel(new_excel)
 
-    XPRO.Excel_IO().load_workbook_from_stream(checked_excel)[0].save("ddd.xlsx")
+    # XPRO.Excel_IO().load_workbook_from_stream(checked_excel)[0].save("ddd.xlsx")
 
     # print("range_and_rule", range_and_rule)
 
@@ -347,6 +347,8 @@ def load_split_parameters():
     split_dict = splitExcelExporter.split_worksheet()
     print("split_dict", split_dict)
     for k, v in split_dict.items():
+        if k == None:
+            split_dict[k] = "缺失值" + ".xlsx"
         split_dict[k] = k + ".xlsx"
 
     zip_stream = splitExcelExporter.zip_split_files(split_dict)

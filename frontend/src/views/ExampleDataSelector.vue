@@ -37,14 +37,11 @@ const loadAndDisplayExcelContent = async (exampleExcelBlob) => {
     const options = {
         includeStyles: true,
         includeFormulas: true,
+        includeUnusedNames: false
     }
     if (exampleExcelBlob.value) {
         if (spread.value) {
             spread.value.import(exampleExcelBlob.value, () => {
-                for (let i = 0; i < spread.value.getSheetCount(); i++) {
-                    let sheet = spread.value.getSheet(i);
-                    sheet.options.isProtected = true; // 设置每个工作表为保护状态
-                }
                 const sheet = spread.value.getActiveSheet();
                 const minRowCount = 50;
                 const minColumnCount = 50;
@@ -166,7 +163,7 @@ const goHome = () => {
             </gc-spread-sheets>
         </div>
         <div class="tip-container">
-            <div class="tip-texts">请在左侧表格中选中的表头（字段），选中的字段会显示在右侧</div>
+            <div class="tip-texts">请在左侧表格中选中所有表头，选中的单元格会显示在下方</div>
             <div>{{ selectedRanges }}</div>
             <div class="input-container">
                 <label for="startRowInput" class="input-label">请输入数据开始行：</label>
@@ -176,7 +173,7 @@ const goHome = () => {
             </div>
             <div class="error-message" v-if="startRowError">{{ startRowError }}</div>
             <button v-if="exampleExcelBlob && selectedRanges && startRow && !startRowError"
-                @click="sendData">上传数据</button>
+                @click="sendData" style="margin-top: 20px;">上传数据</button>
         </div>
 
 

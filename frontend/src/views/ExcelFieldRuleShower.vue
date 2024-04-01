@@ -54,7 +54,8 @@ const loadAndDisplayExcelContent = async (blob) => {
   // console.log(blob.value)
   // const arrayBuffer = await blob.value.arrayBuffer();
   const options = {
-    includeStyles: true
+    includeStyles: true,
+    includeUnusedNames: false
   }
   if (blob) {
     spread.value.clearSheets();
@@ -104,11 +105,11 @@ const saveRuleFile = () => {
 }
 
 const saveExcelFile = () => {
-  spread.value.export((blob) => {
-    saveAs(blob, `含规则-${ excelFileName.value }.xlsx`);
-  }, (error) => {
-    console.error("error: ", error);
-  }, {});
+
+  if (['xls'].includes(excelFileName.value.split('.').pop())) {
+    saveAs(currentExcelAndRule.value[0], `含规则-${excelFileName.value}x`)
+  } else { saveAs(currentExcelAndRule.value[0], `含规则-${excelFileName.value}`); }
+
 }
 
 
@@ -195,7 +196,7 @@ const goHome = () => {
 }
 
 .mode-button:hover {
-  background-image: linear-gradient(to right, #0e6590, #0277bd);
+  background-image: linear-gradient(to right,#817e7e, #817e7e);
   /* 鼠标悬停时的背景变化 */
 }
 </style>

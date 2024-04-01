@@ -6,13 +6,16 @@ import http from "@/api/http.js";
 import router from "@/router/index.js";
 import store from "@/store/index.js";
 import { saveAs } from 'file-saver';
+import UploadStatusModal from '@/components/UploadStatusModal.vue';
 
 import '@grapecity/spread-sheets/styles/gc.spread.sheets.excel2016colorful.css';
 import { GcSpreadSheets, GcWorksheet } from '@grapecity/spread-sheets-vue';
 import '@grapecity/spread-sheets-io';
 import * as GC from '@grapecity/spread-sheets'
 
+const isModalVisible = ref(false);
 const spread = ref(null);
+const modalMessage = ref('')
 const spreadStyles = computed(() => {
     return { width: '100%', height: '600px' };
 });
@@ -33,7 +36,7 @@ const initSpread = (s) => {
         // saveAs(currentExcelBlob, "ddd.xlsx");
         loadAndDisplayExcelContent(currentExcelBlob)
         spread.value.bind(GC.Spread.Sheets.Events.CellClick, handleCellClick);
-    } else{
+    } else {
         spread.value = s;
     }
 }
@@ -114,7 +117,7 @@ const recheckExcelData = async () => {
             console.log("response.data", response.data);
             currentRecheckExcelInfo.value = response.data;
             if (currentRecheckExcelInfo.value.recheck_excel_fileName !== "") {
-                console.log("currentRecheckExcelInfo.value.recheck_excel_fileName",currentRecheckExcelInfo.value.recheck_excel_fileName);
+                console.log("currentRecheckExcelInfo.value.recheck_excel_fileName", currentRecheckExcelInfo.value.recheck_excel_fileName);
                 const base64String = currentRecheckExcelInfo.value.recheck_excel
                 const currentExcelBlob = base64ToBlob(base64String, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
                 // console.log("currentExcelBlob", currentExcelBlob);
@@ -141,11 +144,14 @@ const recheckExcelData = async () => {
 const sendContact = async () => {
 
     try {
+        isModalVisible.value = true
+        modalMessage.value = '正在上传并处理中，请稍候';
         const response = await http.post('/contact', {}, { responseType: "blob" });
         console.log('response.data', response.data);
 
         const contactedExcelBlob = new Blob([response.data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }); // 使用返回的 blob 数据创建一个 Blob 对象
         saveAs(contactedExcelBlob, "总表.xlsx"); // 使用 saveAs 保存文件
+        isModalVisible.value = false;
     } catch (error) {
         console.error('Failed to send data', error);
     }
@@ -170,7 +176,7 @@ const goHome = () => {
     <div class="title-container">
         <div class="title-text">数据检验</div>
     </div>
-    <div class="excel-container" >
+    <div class="excel-container">
         <div class="excel-area"><!--  v-if="currentRecheckExcelInfo.recheck_excel_fileName !== ''" -->
             <div class="excel-tools">
 
@@ -183,9 +189,9 @@ const goHome = () => {
                 <gc-worksheet></gc-worksheet>
             </gc-spread-sheets>
         </div>
-        
+
         <div class="tip-container">
-            <div id="button-check">
+            <div id="button-check" v-if="currentRecheckExcelInfo.check_info.length > 0">
                 <div class="tip-texts">请点击检查按钮进行数据检验</div>
                 <button @click="recheckExcelData">检查</button>
             </div>
@@ -193,16 +199,20 @@ const goHome = () => {
             <div id="error-position">
                 <template v-if="currentRecheckExcelInfo.check_info.length > 0">
                     <h2>以下是可能存在问题的数据的位置和原因</h2>
-                    <p>{{  currentRecheckExcelInfo.check_info }}</p>
+                    <p>{{ currentRecheckExcelInfo.check_info }}</p>
                 </template>
                 <template v-else>
-                    <h2>请点击合并文件</h2>
-                    <button v-if="currentRecheckExcelInfo.recheck_excel_fileName === ''" @click="sendContact" style="margin-top: 20px;">合并文件</button>
+                    <div style="margin-top: 20px;">
+                        <h2>请点击合并文件</h2>
+                        <button v-if="currentRecheckExcelInfo.recheck_excel_fileName === ''"
+                            @click="sendContact" style="margin-top: 20px;">合并文件</button>
+                    </div>
                 </template>
             </div>
-            
+
         </div>
     </div>
+    <UploadStatusModal :isVisible="isModalVisible" :message="modalMessage" />
 
 
 
