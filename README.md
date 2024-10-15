@@ -1,6 +1,6 @@
 # Excelerate
 
-Accelerating Excel Operations with a modern web interface and a powerful backend.
+Excelerate是一个桌面应用程序，旨在为高校行政工作的表格任务发布者和执行者搭建一个沟通桥梁，实现全流程工作自动化。具体而言“规则制定”“数据检验”“文件合并”“文件拆分”四个功能模块。功能演示可见根目录下的视频。
 
 ## 开始
 
@@ -42,7 +42,6 @@ cd backend
 
 3. 复现conda虚拟环境：
 
-
 ```bash
 conda env create -f environment.yml -n your_env_name
 conda activate your_env_name
@@ -80,32 +79,7 @@ npm run dev
 
 分别进入前后端的目录，然后运行开发服务器的命令
 
-
 ## 使用到的技术
 
-* [Flask](http://flask.pocoo.org/) - 用于后端API的微框架
-* [Vue.js](https://vuejs.org/) - 前端框架，用于构建用户界面
-
-
-## 贡献
-
-如果你想为项目贡献代码，请先阅读 `CONTRIBUTING.md`，了解如何提交 pull requests。如果你发现任何问题，可以提交 issue。
-
-## 版本控制
-
-我们使用 Git 进行版本控制，具体的分支管理和版本策略可以在 `VERSIONING.md` 中找到。
-
-## 作者
-
-* **zth** - *初始工作* - [你的GitHub账号](链接到你的GitHub账号)
-
-## 许可证
-
-这个项目是在 MIT 许可证下授权的 - 查看 `LICENSE` 文件了解详情。
-
-## 鸣谢
-
-* 感谢所有为这个项目做出贡献的人。
-* 感谢所有提供反馈和使用本项目的用户。
-* 感谢所有提供灵感和前沿技术的开源项目。
-
+- [Flask](http://flask.pocoo.org/) - 用于后端API的微框架
+- [Vue.js](https://vuejs.org/) - 前端框架，用于构建用户界面
